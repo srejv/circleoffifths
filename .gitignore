@@ -93,3 +93,6 @@ venv/
 env/
 ENV/
 .venv/
+
+# 
+slask/
