@@ -101,6 +101,14 @@ class CircleOfFifths:
         """
         potential_answers = self.get_next_chord(selected_chord, question_type, chord_type == ChordType.MAJOR)
         if chord_answer in potential_answers:
-            print(f"Correct! {chord_answer} is the next chord in the {question_type.name.lower()} direction from {selected_chord}.")
+            if question_type == QuestionType.ALTERNATIVE_CIRCLE:
+                return True, f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}."
+            elif question_type == QuestionType.ANY:
+                return True, f"Correct! {chord_answer} is a neighbor chord of {selected_chord}."
+            return True, f"Correct! {chord_answer} is the next chord in the {question_type.name.lower()} direction from {selected_chord}."
         else:
-            print(f"No. {chord_answer} is not the next chord in the {question_type.name.lower()} direction from {selected_chord}.")
+            if question_type == QuestionType.ALTERNATIVE_CIRCLE:
+                return False, f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}."
+            elif question_type == QuestionType.ANY:
+                return False, f"No. {chord_answer} is not a neighbor chord of {selected_chord}."
+            return False, f"No. {chord_answer} is not the next chord in the {question_type.name.lower()} direction from {selected_chord}."
