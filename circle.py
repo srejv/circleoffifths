@@ -3,11 +3,11 @@ from enum import Enum
 
 majorChords = [
     Chord("C", 0), Chord("G", 1), Chord("D", 2), Chord("A", 3), Chord("E", 4), Chord("B", 5),
-    Chord("F#/Gb", 6), Chord("C#/Db", 7), Chord("Ab/G#", 8), Chord("D#/Eb", 9), Chord("A#/Bb", 10), Chord("F", 11)
+    Chord("F#/Gb", 6), Chord("C#/Db", 7), Chord("G#/Ab", 8), Chord("D#/Eb", 9), Chord("A#/Bb", 10), Chord("F", 11)
 ]
 minorChords = [
     Chord("Am", 0), Chord("Em", 1), Chord("Bm", 2), Chord("F#m/Gbm", 3), Chord("C#m/Dbm", 4),
-    Chord("Abm/G#m", 5), Chord("D#m/Ebm", 6), Chord("A#m/Bbm", 7), Chord("Fm", 8), Chord("Cm", 9),
+    Chord("G#m/Abm", 5), Chord("D#m/Ebm", 6), Chord("A#m/Bbm", 7), Chord("Fm", 8), Chord("Cm", 9),
     Chord("Gm", 10), Chord("Dm", 11)
 ]
 
