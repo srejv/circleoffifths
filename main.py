@@ -57,14 +57,18 @@ def main_loop():
     screen = pygame.display.set_mode((600, 200))
     pygame.display.set_caption("Circle of Fifths Quiz")
     clock = pygame.time.Clock()
+
     question_font = pygame.font.SysFont(None, 20)
     font = pygame.font.SysFont(None, 48)
 
     correct_answers = 0
     wrong_answers = 0
     total_questions = 0
+
     input_text = ""
     result_text = ""
+
+    # These should be an enum QuizStates (Asking, Answered, Continue)
     active = True  # Whether input is being accepted
     advance = False
 
