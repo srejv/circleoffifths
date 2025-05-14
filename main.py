@@ -25,7 +25,7 @@ def generate_question(question_type, selected_chord, chord_type):
 
 
 def new_question(circle, number_of_chords_to_ask_about):
-    question = random.choice(question_types)
+    question = QuestionType.FILL_IN # random.choice(question_types)
     chord_type = random.choice(chord_types)
 
     selected_list = circle.get_chord_list(chord_type)
