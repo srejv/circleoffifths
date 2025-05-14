@@ -2,6 +2,7 @@
 
 import random
 from circle import *
+import pygame
 
 def read_input():
     """
@@ -33,7 +34,6 @@ def generate_question(question_type, selected_chord, chord_type):
     else:
         return f"What is the name of any neighbor chord {selected_chord}?"
 
-import pygame
 
 def new_question(circle, number_of_chords_to_ask_about):
     question = random.choice(question_types)
