@@ -74,28 +74,32 @@ def main_loop():
 
     chord_answer = None
 
+    redraw = True
+
     question, selected_chord, chord_type = new_question(circle, number_of_chords_to_ask_about)
 
     while True:
 
         # Rendering
-        screen.fill((30, 30, 30))
+        if redraw:
+            redraw = False
+            screen.fill((30, 30, 30))
 
-        question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
-        screen.blit(question_surface, (20, 10))
+            question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
+            screen.blit(question_surface, (20, 10))
 
-        text_surface = font.render(input_text, True, (255, 255, 255))
-        screen.blit(text_surface, (20, 80))
+            text_surface = font.render(input_text, True, (255, 255, 255))
+            screen.blit(text_surface, (20, 80))
 
-        if not active:
-            result_surface = question_font.render(result_text, True, (255, 255, 255))
-            screen.blit(result_surface, (20, 110))
+            if not active:
+                result_surface = question_font.render(result_text, True, (255, 255, 255))
+                screen.blit(result_surface, (20, 110))
 
-        range_surface = question_font.render(generate_question_range_string(number_of_chords_to_ask_about), True, (255, 255, 255))
-        screen.blit(range_surface, (500, 20))
+            range_surface = question_font.render(generate_question_range_string(number_of_chords_to_ask_about), True, (255, 255, 255))
+            screen.blit(range_surface, (500, 20))
 
-        answers_surface = question_font.render(generate_number_of_answers_string(correct_answers, total_questions), True, (255, 255, 255))
-        screen.blit(answers_surface, (500, 50))
+            answers_surface = question_font.render(generate_number_of_answers_string(correct_answers, total_questions), True, (255, 255, 255))
+            screen.blit(answers_surface, (500, 50))
 
         # Event handling
         for event in pygame.event.get():
@@ -104,6 +108,7 @@ def main_loop():
                 exit()
             
             if event.type == pygame.KEYDOWN:
+                redraw = True
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
@@ -119,6 +124,7 @@ def main_loop():
                     continue
 
             if active and event.type == pygame.KEYDOWN:
+                redraw = True                                    
                 if event.key == pygame.K_BACKSPACE:
                     input_text = input_text[:-1]
                 elif event.key == pygame.K_RETURN:
@@ -139,10 +145,12 @@ def main_loop():
                     input_text += event.unicode
 
             if not active and event.type == pygame.KEYUP:
+                redraw = True
                 if event.key == pygame.K_RETURN:
                     advance = True
             
             if not active and event.type == pygame.KEYDOWN:
+                redraw = True
                 if event.key == pygame.K_RETURN and advance:
                     input_text = ""  # Clear after Enter
                     result_text = ""
