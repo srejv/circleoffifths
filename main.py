@@ -55,7 +55,6 @@ def main_loop():
     font = pygame.font.SysFont(None, 48)
 
     correct_answers = 0
-    wrong_answers = 0
     total_questions = 0
 
     input_text = ""
@@ -144,8 +143,6 @@ def main_loop():
                     total_questions += 1
                     if was_correct:
                         correct_answers += 1
-                    else:
-                        wrong_answers += 1
 
                 else:
                     input_text += event.unicode
