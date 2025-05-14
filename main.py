@@ -3,6 +3,7 @@
 import random
 from circle import *
 import pygame
+from render import CircleOfFifthsDrawable
 
 def generate_question(question_type, selected_chord, chord_type):
     """
@@ -38,11 +39,15 @@ def generate_number_of_answers_string(correct_answers, total_questions):
     return f"{correct_answers} / {total_questions}"
 
 def main_loop():
+    pygame.init()
+
     number_of_chords_to_ask_about = 1
     circle = CircleOfFifths()
+    circle_render = CircleOfFifthsDrawable(circle.majorChords, circle.minorChords)
+    circle_render.set_center((400, 360))
 
-    pygame.init()
-    screen = pygame.display.set_mode((600, 200))
+    screen = pygame.display.set_mode((800, 600))
+    overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
     pygame.display.set_caption("Circle of Fifths Quiz")
     clock = pygame.time.Clock()
 
@@ -66,11 +71,23 @@ def main_loop():
 
     question, selected_chord, chord_type = new_question(circle, number_of_chords_to_ask_about)
 
+    blink_counter = 0
+    blink = False
+
     while True:
 
         # Rendering
         if redraw:
             redraw = False
+
+            overlay.fill((0,0,0,0))
+
+            circle_render.draw_circle(screen)
+            circle_render.draw_highlighted_chord(overlay, selected_chord, chord_type, blink)
+            if not active:
+                circle_render.draw_circle_labels(overlay)
+
+            screen.blit(overlay, (0, 0))
             screen.fill((30, 30, 30))
 
             question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
@@ -88,6 +105,7 @@ def main_loop():
 
             answers_surface = question_font.render(generate_number_of_answers_string(correct_answers, total_questions), True, (255, 255, 255))
             screen.blit(answers_surface, (500, 50))
+
 
         # Event handling
         for event in pygame.event.get():
@@ -146,6 +164,11 @@ def main_loop():
                     active = True
                     advance = False
 
+        blink_counter += 1
+        if blink_counter > 30:
+            blink = not blink
+            blink_counter = 0
+            redraw = True
 
         pygame.display.flip()
         clock.tick(60)
