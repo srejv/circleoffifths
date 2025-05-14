@@ -80,6 +80,7 @@ def main_loop():
         if redraw:
             redraw = False
 
+            screen.fill((30, 30, 30))
             overlay.fill((0,0,0,0))
 
             circle_render.draw_circle(screen)
@@ -88,7 +89,6 @@ def main_loop():
                 circle_render.draw_circle_labels(overlay)
 
             screen.blit(overlay, (0, 0))
-            screen.fill((30, 30, 30))
 
             question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
             screen.blit(question_surface, (20, 10))
