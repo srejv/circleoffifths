@@ -90,14 +90,17 @@ def main_loop():
             screen.blit(overlay, (0, 0))
 
             question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
-            screen.blit(question_surface, (20, 10))
+            question_text_rect = question_surface.get_rect(center=(400, 20))  
+            screen.blit(question_surface, question_text_rect)
 
-            text_surface = font.render(input_text, True, (255, 255, 255))
-            screen.blit(text_surface, (20, 80))
+            input_text_surface = font.render(input_text, True, (255, 255, 255))
+            input_text_rect = input_text_surface.get_rect(center=(400, 80))
+            screen.blit(input_text_surface, input_text_rect)
 
             if not active:
                 result_surface = question_font.render(result_text, True, (255, 255, 255))
-                screen.blit(result_surface, (20, 110))
+                result_text_rect = result_surface.get_rect(center=(400, 110))
+                screen.blit(result_surface, result_text_rect)
 
             range_surface = question_font.render(generate_question_range_string(number_of_chords_to_ask_about), True, (255, 255, 255))
             screen.blit(range_surface, (700, 20))
