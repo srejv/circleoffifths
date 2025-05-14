@@ -101,10 +101,10 @@ def main_loop():
                 screen.blit(result_surface, (20, 110))
 
             range_surface = question_font.render(generate_question_range_string(number_of_chords_to_ask_about), True, (255, 255, 255))
-            screen.blit(range_surface, (500, 20))
+            screen.blit(range_surface, (700, 20))
 
             answers_surface = question_font.render(generate_number_of_answers_string(correct_answers, total_questions), True, (255, 255, 255))
-            screen.blit(answers_surface, (500, 50))
+            screen.blit(answers_surface, (700, 50))
 
 
         # Event handling
