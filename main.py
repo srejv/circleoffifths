@@ -4,18 +4,6 @@ import random
 from circle import *
 import pygame
 
-def read_input():
-    """
-    Reads input from the user.
-    """
-    return input("Answer: ")
-
-def print_question(question_type, selected_chord):
-    """
-    Prints the question based on the question type and selected chord.
-    """
-    print_question(generate_question(question_type, selected_chord))
-
 def generate_question(question_type, selected_chord, chord_type):
     """
     Creates the question string based on the question type and selected chord.
