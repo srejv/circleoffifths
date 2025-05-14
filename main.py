@@ -15,11 +15,16 @@ def print_question(question_type, selected_chord):
     """
     print_question(generate_question(question_type, selected_chord))
 
-def generate_question(question_type, selected_chord):
+def generate_question(question_type, selected_chord, chord_type):
     """
     Creates the question string based on the question type and selected chord.
     """
-    if question_type == QuestionType.CLOCKWISE:
+    if question_type == QuestionType.FILL_IN:
+        if chord_type == ChordType.MAJOR:
+            return f"What is the name of the major chord at {(selected_chord.index + 11) % 12 + 1} o'clock?"
+        else:
+            return f"What is the name of the minor chord at {(selected_chord.index + 11) % 12 + 1} o'clock?"
+    elif question_type == QuestionType.CLOCKWISE:
         return f"What is the chord clockwise from the chord {selected_chord}?"
     elif question_type == QuestionType.COUNTERCLOCKWISE:
         return f"What is the chord counterclockwise from the chord {selected_chord}?"
@@ -72,7 +77,7 @@ def main_loop():
         # Rendering
         screen.fill((30, 30, 30))
 
-        question_surface = question_font.render(generate_question(question, selected_chord), True, (255, 255, 255))
+        question_surface = question_font.render(generate_question(question, selected_chord, chord_type), True, (255, 255, 255))
         screen.blit(question_surface, (20, 10))
 
         text_surface = font.render(input_text, True, (255, 255, 255))

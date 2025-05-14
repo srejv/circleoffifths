@@ -16,7 +16,8 @@ class QuestionType(Enum):
     CLOCKWISE = 1
     COUNTERCLOCKWISE = 2
     ALTERNATIVE_CIRCLE = 3
-    ANY = 4
+    ANY = 4,
+    FILL_IN = 5
 
 class ChordType(Enum):
     MAJOR = 1
@@ -75,7 +76,9 @@ class CircleOfFifths:
         """
         if is_major:
             n = len(self.majorChords)
-            if direction == QuestionType.CLOCKWISE:
+            if direction == QuestionType.FILL_IN:
+                return [self.majorChords[chord.index % n]]
+            elif direction == QuestionType.CLOCKWISE:
                 return [self.majorChords[(chord.index + 1) % n]]
             elif direction == QuestionType.COUNTERCLOCKWISE:
                 return [self.majorChords[(chord.index - 1) % n]]
@@ -86,7 +89,9 @@ class CircleOfFifths:
 
         else:
             n = len(self.minorChords)
-            if direction == QuestionType.CLOCKWISE:
+            if direction == QuestionType.FILL_IN:
+                return [self.minorChords[chord.index % n]]
+            elif direction == QuestionType.CLOCKWISE:
                 return [self.minorChords[(chord.index + 1) % n]]
             elif direction == QuestionType.COUNTERCLOCKWISE:
                 return [self.minorChords[(chord.index - 1) % n]]
@@ -101,13 +106,17 @@ class CircleOfFifths:
         """
         potential_answers = self.get_next_chord(selected_chord, question_type, chord_type == ChordType.MAJOR)
         if chord_answer in potential_answers:
-            if question_type == QuestionType.ALTERNATIVE_CIRCLE:
+            if question_type == QuestionType.FILL_IN:
+                return True, f"Correct! {chord_answer} is the correct answer."
+            elif question_type == QuestionType.ALTERNATIVE_CIRCLE:
                 return True, f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}."
             elif question_type == QuestionType.ANY:
                 return True, f"Correct! {chord_answer} is a neighbor chord of {selected_chord}."
             return True, f"Correct! {chord_answer} is the next chord in the {question_type.name.lower()} direction from {selected_chord}."
         else:
-            if question_type == QuestionType.ALTERNATIVE_CIRCLE:
+            if question_type == QuestionType.FILL_IN:
+                return False, f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}."
+            elif question_type == QuestionType.ALTERNATIVE_CIRCLE:
                 return False, f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}."
             elif question_type == QuestionType.ANY:
                 return False, f"No. {chord_answer} is not a neighbor chord of {selected_chord}."
