@@ -4,9 +4,6 @@ import colorsys
 
 from circle import ChordType
 
-# Pygame setup
-pygame.init()
-
 # Color generator using HSV for smooth variation
 def hsv_color(i, total):
     hue = i / total
