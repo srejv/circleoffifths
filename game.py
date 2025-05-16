@@ -2,6 +2,12 @@ import pygame
 import random
 from circle import CircleOfFifths, QuestionType, ChordType
 from render import CircleOfFifthsDrawable
+from enum import Enum
+
+class GameState(Enum):
+    ACTIVE = 1
+    INACTIVE = 2
+    ADVANCE = 3
 
 class CircleOfFifthsGame:
     SCREEN_WIDTH = 800
@@ -26,8 +32,7 @@ class CircleOfFifthsGame:
         self.total_questions = 0
         self.input_text = ""
         self.result_text = ""
-        self.active = True
-        self.advance = False
+        self.state = GameState.ACTIVE
         self.blink = False
         self.blink_counter = 0
         self.redraw = True
@@ -56,19 +61,19 @@ class CircleOfFifthsGame:
                     self.number_of_chords_to_ask_about = min(self.number_of_chords_to_ask_about + 1, 12)
                 elif event.key == pygame.K_MINUS:
                     self.number_of_chords_to_ask_about = max(self.number_of_chords_to_ask_about - 1, 1)
-                elif self.active:
+                elif self.state == GameState.ACTIVE:
                     self.handle_input(event)
-                elif not self.active and event.key == pygame.K_RETURN:
-                    self.advance = True
+                elif self.state == GameState.INACTIVE and event.key == pygame.K_RETURN:
+                    self.state = GameState.ADVANCE
 
-            if not self.active and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN and self.advance:
+            if self.state == GameState.ADVANCE and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.reset_for_next_question()
 
     def handle_input(self, event):
         if event.key == pygame.K_BACKSPACE:
             self.input_text = self.input_text[:-1]
         elif event.key == pygame.K_RETURN:
-            self.active = False
+            self.state = GameState.INACTIVE
             chord_answer = self.circle.find_chord(self.input_text)
             if chord_answer is None:
                 self.result_text = f"{self.input_text} is not a valid chord."
@@ -86,8 +91,7 @@ class CircleOfFifthsGame:
         self.input_text = ""
         self.result_text = ""
         self.question, self.selected_chord, self.chord_type = self.new_question()
-        self.active = True
-        self.advance = False
+        self.state = GameState.ACTIVE
 
     def update_blink(self):
         self.blink_counter += 1
@@ -106,7 +110,7 @@ class CircleOfFifthsGame:
 
         self.circle_render.draw_circle(self.screen)
         self.circle_render.draw_highlighted_chord(self.overlay, self.selected_chord, self.chord_type, self.blink)
-        if not self.active:
+        if not self.state == GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
 
         self.screen.blit(self.overlay, (0, 0))
@@ -121,7 +125,7 @@ class CircleOfFifthsGame:
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
-        if not self.active:
+        if not self.state == GameState.ACTIVE:
             result_surface = self.font_small.render(self.result_text, True, (255, 255, 255))
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
