@@ -18,7 +18,7 @@ def polar_to_cartesian(center, angle_deg, radius):
     return (int(x), int(y))
 
 class CircleOfFifthsDrawable:
-    def __init__(self, majorChords=None, minorChords=None):
+    def __init__(self, majorChords=None, minorChords=None, font=None):
 
         self.majorChords = majorChords or []
         self.minorChords = minorChords or []
@@ -26,7 +26,7 @@ class CircleOfFifthsDrawable:
         self.WIDTH = 600
         self.HEIGHT = 600
 
-        self.FONT = pygame.font.SysFont(None, 30)
+        self.FONT = font or pygame.font.SysFont(None, 30)
 
         # Constants
         self.CENTER = (self.WIDTH // 2, self.HEIGHT // 2)
