@@ -38,7 +38,7 @@ class CircleOfFifths:
         self.majorChords = majorChords
         self.minorChords = minorChords
 
-    def get_chord_list(self, chord_type):
+    def get_chord_list(self, chord_type: ChordType):
         """
         Returns the list of chords based on the chord type.
         """
