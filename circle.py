@@ -49,14 +49,11 @@ class CircleOfFifths:
         else:
             raise ValueError("Invalid chord type")
 
-    def find_chord(self, name):
+    def find_chord(self, name: str):
         """
         Finds the chord with the given name.
         """
-        for chord in self.minorChords:
-            if chord.contains(name):
-                return chord
-        for chord in self.majorChords:
+        for chord in self.minorChords + self.majorChords:
             if chord.contains(name):
                 return chord
         return None
