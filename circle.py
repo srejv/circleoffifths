@@ -26,6 +26,8 @@ class ChordType(Enum):
 question_types = [ QuestionType.CLOCKWISE, QuestionType.COUNTERCLOCKWISE, QuestionType.ALTERNATIVE_CIRCLE, QuestionType.ANY ]
 chord_types = [ ChordType.MAJOR, ChordType.MINOR ]
 
+CIRCLE_SIZE = 12
+
 class CircleOfFifths:
     """
     A class to represent the Circle of Fifths.
@@ -62,11 +64,9 @@ class CircleOfFifths:
         """
         Returns the chord at the given index.
         """
-        if is_major:
-            return self.majorChords[index]
-        else:
-            return self.minorChords[index]
-    
+        chord_list = self.majorChords if is_major else self.minorChords
+        return chord_list[index % CIRCLE_SIZE]
+
     def get_next_chord(self, chord, direction, is_major=True):
         chord_list = self.majorChords if is_major else self.minorChords
         n = len(chord_list)
