@@ -92,6 +92,8 @@ class CircleOfFifthsGame:
         self.result_text = ""
         self.question, self.selected_chord, self.chord_type = self.new_question()
         self.state = GameState.ACTIVE
+        self.blink = False
+        self.blink_counter = 0
 
     def update_blink(self):
         self.blink_counter += 1
