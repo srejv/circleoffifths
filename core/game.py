@@ -27,9 +27,9 @@ class CircleOfFifthsGame:
         Args:
             lang (str): Language code for localization (default "en").
         """
+        pygame.display.set_caption("Circle of Fifths Quiz")
         self.screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
         self.overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
-        pygame.display.set_caption("Circle of Fifths Quiz")
         self.clock: pygame.time.Clock = pygame.time.Clock()
 
         self.font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
