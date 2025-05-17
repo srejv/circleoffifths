@@ -16,7 +16,7 @@ class QuestionType(Enum):
     CLOCKWISE = 1
     COUNTERCLOCKWISE = 2
     ALTERNATIVE_CIRCLE = 3
-    ANY = 4,
+    ANY = 4
     FILL_IN = 5
 
 class ChordType(Enum):
