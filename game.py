@@ -110,26 +110,34 @@ class CircleOfFifthsGame:
 
         self.circle_render.draw_circle(self.screen)
         self.circle_render.draw_highlighted_chord(self.overlay, self.selected_chord, self.chord_type, self.blink)
-        if not self.state == GameState.ACTIVE:
+        if self.state != GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
 
         self.screen.blit(self.overlay, (0, 0))
+        self.render_question()
+        self.render_input()
+        self.render_results()
+        self.render_stats()
 
-        question_surface = self.font_small.render(
-            self.generate_question_text(), True, (255, 255, 255)
-        )
-        question_text_rect = question_surface.get_rect(center=(400, 20))  
+        pygame.display.flip()
+
+    def render_question(self):
+        question_surface = self.font_small.render(self.generate_question_text(), True, (255, 255, 255))
+        question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
+    def render_input(self):
         input_surface = self.font_large.render(self.input_text, True, (255, 255, 255))
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
-        if not self.state == GameState.ACTIVE:
+    def render_results(self):
+        if self.state != GameState.ACTIVE:
             result_surface = self.font_small.render(self.result_text, True, (255, 255, 255))
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
 
+    def render_stats(self):
         range_surface = self.font_small.render(
             f"Range: {self.number_of_chords_to_ask_about}", True, (255, 255, 255)
         )
@@ -139,8 +147,6 @@ class CircleOfFifthsGame:
             f"{self.correct_answers} / {self.total_questions}", True, (255, 255, 255)
         )
         self.screen.blit(answers_surface, (700, 50))
-
-        pygame.display.flip()
 
     def generate_question_text(self):
         templates = {
