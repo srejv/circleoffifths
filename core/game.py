@@ -1,7 +1,7 @@
 import pygame
 import random
-from circle import CircleOfFifths, QuestionType, ChordType
-from render import CircleOfFifthsDrawable
+from core.circle import CircleOfFifths, QuestionType, ChordType
+from ui.render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
 from localization import Localization

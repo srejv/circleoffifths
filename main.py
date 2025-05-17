@@ -1,5 +1,5 @@
 import pygame
-from game import CircleOfFifthsGame
+from core.game import CircleOfFifthsGame
 
 def main():
     pygame.init()

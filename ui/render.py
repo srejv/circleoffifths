@@ -2,7 +2,7 @@ import pygame
 import math
 import colorsys
 
-from circle import ChordType
+from core.circle import ChordType
 
 # Color generator using HSV for smooth variation
 def hsv_color(i, total, selected=False):

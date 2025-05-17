@@ -1,4 +1,4 @@
-from chord import Chord
+from core.chord import Chord
 from enum import Enum
 
 # Define the major and minor chords for the circle of fifths.
