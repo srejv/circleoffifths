@@ -3,6 +3,7 @@ import random
 from circle import CircleOfFifths, QuestionType, ChordType
 from render import CircleOfFifthsDrawable
 from enum import Enum
+from config import Config
 
 class GameState(Enum):
     ACTIVE = 1
@@ -10,18 +11,15 @@ class GameState(Enum):
     ADVANCE = 3
 
 class CircleOfFifthsGame:
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
-    FPS = 60
 
     def __init__(self):
-        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-        self.overlay = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.SRCALPHA)
+        self.screen = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+        self.overlay = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
         pygame.display.set_caption("Circle of Fifths Quiz")
         self.clock = pygame.time.Clock()
 
-        self.font_small = pygame.font.SysFont(None, 20)
-        self.font_large = pygame.font.SysFont(None, 48)
+        self.font_small = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
+        self.font_large = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
 
         self.circle = CircleOfFifths()
         self.circle_render = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
@@ -107,7 +105,7 @@ class CircleOfFifthsGame:
             return
 
         self.redraw = False
-        self.screen.fill((30, 30, 30))
+        self.screen.fill(Config.COLORS["background"])
         self.overlay.fill((0, 0, 0, 0))
 
         self.circle_render.draw_circle(self.screen)
@@ -124,29 +122,29 @@ class CircleOfFifthsGame:
         pygame.display.flip()
 
     def render_question(self):
-        question_surface = self.font_small.render(self.generate_question_text(), True, (255, 255, 255))
+        question_surface = self.font_small.render(self.generate_question_text(), True, Config.COLORS["text"])
         question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
     def render_input(self):
-        input_surface = self.font_large.render(self.input_text, True, (255, 255, 255))
+        input_surface = self.font_large.render(self.input_text, True, Config.COLORS["text"])
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
     def render_results(self):
         if self.state != GameState.ACTIVE:
-            result_surface = self.font_small.render(self.result_text, True, (255, 255, 255))
+            result_surface = self.font_small.render(self.result_text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
 
     def render_stats(self):
         range_surface = self.font_small.render(
-            f"Range: {self.number_of_chords_to_ask_about}", True, (255, 255, 255)
+            f"Range: {self.number_of_chords_to_ask_about}", True, Config.COLORS["text"]
         )
         self.screen.blit(range_surface, (700, 20))
 
         answers_surface = self.font_small.render(
-            f"{self.correct_answers} / {self.total_questions}", True, (255, 255, 255)
+            f"{self.correct_answers} / {self.total_questions}", True, Config.COLORS["text"]
         )
         self.screen.blit(answers_surface, (700, 50))
 
@@ -165,4 +163,4 @@ class CircleOfFifthsGame:
             self.handle_events()
             self.update_blink()
             self.render()
-            self.clock.tick(self.FPS)
+            self.clock.tick(Config.FPS)
