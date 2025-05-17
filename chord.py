@@ -1,37 +1,20 @@
-
 class Chord:
     """
     A class to represent a musical chord.
     """
 
-    def __init__(self, name, index):
+    def __init__(self, name):
         """
-        Initializes the Chord with a name and index.
+        Initializes the Chord with a name.
         """
         self.name = name
-        self.alternative_names = name.split("/")
-        self.index = index
+        self.alternative_names = [n.strip() for n in name.split("/")]
 
     def __str__(self):
-        """
-        Returns the string representation of the Chord.
-        """
         return self.name
-    
-    def is_next_to(self, maybe_neighbor_index, total_chords):
-        """
-        Checks if the given index is next to the chord's index, considering wrapping.
-        """
-        return (self.index - 1) % total_chords == maybe_neighbor_index or \
-               (self.index + 1) % total_chords == maybe_neighbor_index
 
     def contains(self, name):
         """
         Checks if the named chord is a part of this chord.
         """
-        if self.name == name:
-            return True
-        for alt_name in self.alternative_names:
-            if alt_name == name:
-                return True
-        return False
+        return name in self.alternative_names

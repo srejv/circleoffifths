@@ -2,13 +2,13 @@ from chord import Chord
 from enum import Enum
 
 majorChords = [
-    Chord("C", 0), Chord("G", 1), Chord("D", 2), Chord("A", 3), Chord("E", 4), Chord("B", 5),
-    Chord("F#/Gb", 6), Chord("C#/Db", 7), Chord("G#/Ab", 8), Chord("D#/Eb", 9), Chord("A#/Bb", 10), Chord("F", 11)
+    Chord("C"), Chord("G"), Chord("D"), Chord("A"), Chord("E"), Chord("B"),
+    Chord("F#/Gb"), Chord("C#/Db"), Chord("G#/Ab"), Chord("D#/Eb"), Chord("A#/Bb"), Chord("F")
 ]
 minorChords = [
-    Chord("Am", 0), Chord("Em", 1), Chord("Bm", 2), Chord("F#m/Gbm", 3), Chord("C#m/Dbm", 4),
-    Chord("G#m/Abm", 5), Chord("D#m/Ebm", 6), Chord("A#m/Bbm", 7), Chord("Fm", 8), Chord("Cm", 9),
-    Chord("Gm", 10), Chord("Dm", 11)
+    Chord("Am"), Chord("Em"), Chord("Bm"), Chord("F#m/Gbm"), Chord("C#m/Dbm"),
+    Chord("G#m/Abm"), Chord("D#m/Ebm"), Chord("A#m/Bbm"), Chord("Fm"), Chord("Cm"),
+    Chord("Gm"), Chord("Dm")
 ]
 
 
@@ -71,35 +71,25 @@ class CircleOfFifths:
             return self.minorChords[index]
     
     def get_next_chord(self, chord, direction, is_major=True):
-        """
-        Returns the next chord in the given direction.
-        """
-        if is_major:
-            n = len(self.majorChords)
-            if direction == QuestionType.FILL_IN:
-                return [self.majorChords[chord.index % n]]
-            elif direction == QuestionType.CLOCKWISE:
-                return [self.majorChords[(chord.index + 1) % n]]
-            elif direction == QuestionType.COUNTERCLOCKWISE:
-                return [self.majorChords[(chord.index - 1) % n]]
-            elif direction == QuestionType.ALTERNATIVE_CIRCLE:
-                return [self.minorChords[chord.index]]
-            else:
-                return [self.majorChords[(chord.index + 1) % n], self.majorChords[(chord.index - 1) % n], self.minorChords[chord.index]]
-
-        else:
-            n = len(self.minorChords)
-            if direction == QuestionType.FILL_IN:
-                return [self.minorChords[chord.index % n]]
-            elif direction == QuestionType.CLOCKWISE:
-                return [self.minorChords[(chord.index + 1) % n]]
-            elif direction == QuestionType.COUNTERCLOCKWISE:
-                return [self.minorChords[(chord.index - 1) % n]]
-            elif direction == QuestionType.ALTERNATIVE_CIRCLE:
-                return [self.majorChords[chord.index]]
-            else:
-                return [self.minorChords[(chord.index + 1) % n], self.minorChords[(chord.index - 1) % n], self.majorChords[chord.index]]
-    
+        chord_list = self.majorChords if is_major else self.minorChords
+        n = len(chord_list)
+        try:
+            idx = chord_list.index(chord)
+        except ValueError:
+            return []
+        if direction == QuestionType.FILL_IN:
+            return [chord_list[idx % n]]
+        elif direction == QuestionType.CLOCKWISE:
+            return [chord_list[(idx + 1) % n]]
+        elif direction == QuestionType.COUNTERCLOCKWISE:
+            return [chord_list[(idx - 1) % n]]
+        elif direction == QuestionType.ALTERNATIVE_CIRCLE:
+            alt_list = self.minorChords if is_major else self.majorChords
+            return [alt_list[idx]]
+        else:  # ANY
+            alt_list = self.minorChords if is_major else self.majorChords
+            return [chord_list[(idx + 1) % n], chord_list[(idx - 1) % n], alt_list[idx]]
+        
     def check_answer(self, chord_answer, selected_chord, question_type, chord_type):
         """
         Checks if the answer is correct.
@@ -121,3 +111,26 @@ class CircleOfFifths:
             elif question_type == QuestionType.ANY:
                 return False, f"No. {chord_answer} is not a neighbor chord of {selected_chord}."
             return False, f"No. {chord_answer} is not the next chord in the {question_type.name.lower()} direction from {selected_chord}."
+
+    def get_neighbor_indices(self, chord_list, chord):
+        """
+        Returns the indices of the neighbors of the given chord in the chord_list.
+        """
+        n = len(chord_list)
+        try:
+            idx = chord_list.index(chord)
+        except ValueError:
+            return []
+        return [(idx - 1) % n, (idx + 1) % n]
+
+    def is_neighbor(self, chord_list, chord, maybe_neighbor):
+        """
+        Checks if maybe_neighbor is a neighbor of chord in chord_list.
+        """
+        n = len(chord_list)
+        try:
+            idx = chord_list.index(chord)
+            neighbor_indices = [(idx - 1) % n, (idx + 1) % n]
+            return chord_list.index(maybe_neighbor) in neighbor_indices
+        except ValueError:
+            return False

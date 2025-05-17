@@ -149,8 +149,10 @@ class CircleOfFifthsGame:
         self.screen.blit(answers_surface, (700, 50))
 
     def generate_question_text(self):
+        chord_list = self.circle.get_chord_list(self.chord_type)
+        selected_index = chord_list.index(self.selected_chord)
         templates = {
-            QuestionType.FILL_IN: lambda: f"What is the name of the {'major' if self.chord_type == ChordType.MAJOR else 'minor'} chord at {(self.selected_chord.index + 11) % 12 + 1} o'clock?",
+            QuestionType.FILL_IN: lambda: f"What is the name of the {'major' if self.chord_type == ChordType.MAJOR else 'minor'} chord at {(selected_index + 11) % 12 + 1} o'clock?",
             QuestionType.CLOCKWISE: lambda: f"What is the chord clockwise from the chord {self.selected_chord}?",
             QuestionType.COUNTERCLOCKWISE: lambda: f"What is the chord counterclockwise from the chord {self.selected_chord}?",
             QuestionType.ALTERNATIVE_CIRCLE: lambda: f"What is the alternative circle chord for the chord {self.selected_chord}?",
