@@ -1,12 +1,13 @@
 from core.chord import Chord
 from enum import Enum
+from typing import List, Optional, Union
 
 # Define the major and minor chords for the circle of fifths.
-majorChords = [
+majorChords: List[Chord] = [
     Chord("C"), Chord("G"), Chord("D"), Chord("A"), Chord("E"), Chord("B"),
     Chord("F#/Gb"), Chord("C#/Db"), Chord("G#/Ab"), Chord("D#/Eb"), Chord("A#/Bb"), Chord("F")
 ]
-minorChords = [
+minorChords: List[Chord] = [
     Chord("Am"), Chord("Em"), Chord("Bm"), Chord("F#m/Gbm"), Chord("C#m/Dbm"),
     Chord("G#m/Abm"), Chord("D#m/Ebm"), Chord("A#m/Bbm"), Chord("Fm"), Chord("Cm"),
     Chord("Gm"), Chord("Dm")
@@ -25,25 +26,28 @@ class ChordType(Enum):
     MAJOR = 1
     MINOR = 2
 
-question_types = [ QuestionType.CLOCKWISE, QuestionType.COUNTERCLOCKWISE, QuestionType.ALTERNATIVE_CIRCLE, QuestionType.ANY ]
-chord_types = [ ChordType.MAJOR, ChordType.MINOR ]
+question_types: List[QuestionType] = [
+    QuestionType.CLOCKWISE, QuestionType.COUNTERCLOCKWISE,
+    QuestionType.ALTERNATIVE_CIRCLE, QuestionType.ANY
+]
+chord_types: List[ChordType] = [ChordType.MAJOR, ChordType.MINOR]
 
-CIRCLE_SIZE = 12  # Number of chords in the circle
+CIRCLE_SIZE: int = 12  # Number of chords in the circle
 
 class CircleOfFifths:
     """
-    A class to represent the Circle of Fifths and provide utility methods
+    Represents the Circle of Fifths and provides utility methods
     for chord lookup, neighbor calculation, and answer checking.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the Circle of Fifths with major and minor chords.
         """
-        self.majorChords = majorChords
-        self.minorChords = minorChords
+        self.majorChords: List[Chord] = majorChords
+        self.minorChords: List[Chord] = minorChords
 
-    def get_chord_list(self, chord_type: ChordType):
+    def get_chord_list(self, chord_type: ChordType) -> List[Chord]:
         """
         Returns the list of chords based on the chord type.
 
@@ -51,7 +55,7 @@ class CircleOfFifths:
             chord_type (ChordType): The type of chord (MAJOR or MINOR).
 
         Returns:
-            list: The list of Chord objects for the specified type.
+            List[Chord]: The list of Chord objects for the specified type.
         """
         if chord_type == ChordType.MAJOR:
             return self.majorChords
@@ -60,7 +64,7 @@ class CircleOfFifths:
         else:
             raise ValueError("Invalid chord type")
 
-    def find_chord(self, name: str):
+    def find_chord(self, name: str) -> Optional[Chord]:
         """
         Finds the chord with the given name (including alternative names).
 
@@ -68,41 +72,46 @@ class CircleOfFifths:
             name (str): The name or alternative name of the chord.
 
         Returns:
-            Chord or None: The matching Chord object, or None if not found.
+            Optional[Chord]: The matching Chord object, or None if not found.
         """
         for chord in self.minorChords + self.majorChords:
             if chord.contains(name):
                 return chord
         return None
 
-    def get_chord(self, index, is_major=True):
+    def get_chord(self, index: int, chord_type: ChordType = ChordType.MAJOR) -> Chord:
         """
         Returns the chord at the given index, wrapping around the circle.
 
         Args:
             index (int): The index of the chord.
-            is_major (bool): Whether to use the major or minor circle.
+            chord_type (ChordType): The type of chord (MAJOR or MINOR).
 
         Returns:
             Chord: The chord at the specified index.
         """
-        chord_list = self.majorChords if is_major else self.minorChords
+        chord_list = self.get_chord_list(chord_type)
         return chord_list[index % CIRCLE_SIZE]
 
-    def get_next_chord(self, chord, direction, is_major=True):
+    def get_next_chord(
+        self,
+        chord: Chord,
+        direction: QuestionType,
+        chord_type: ChordType = ChordType.MAJOR
+    ) -> List[Chord]:
         """
         Returns the next chord(s) based on the direction and chord type.
 
         Args:
             chord (Chord): The reference chord.
             direction (QuestionType): The direction/question type.
-            is_major (bool): Whether to use the major or minor circle.
+            chord_type (ChordType): The type of chord (MAJOR or MINOR).
 
         Returns:
-            list: List of Chord(s) that are the answer(s) for the given direction.
+            List[Chord]: List of Chord(s) that are the answer(s) for the given direction.
         """
-        chord_list = self.majorChords if is_major else self.minorChords
-        alt_list = self.minorChords if is_major else self.majorChords
+        chord_list = self.get_chord_list(chord_type)
+        alt_list = self.get_chord_list(ChordType.MINOR if chord_type == ChordType.MAJOR else ChordType.MAJOR)
         n = len(chord_list)
         try:
             idx = chord_list.index(chord)
@@ -118,13 +127,13 @@ class CircleOfFifths:
             return [alt_list[idx]]
         else:  # ANY
             return [chord_list[(idx + 1) % n], chord_list[(idx - 1) % n], alt_list[idx]]
-        
+
     def check_answer(
-            self, 
-            chord_answer, 
-            selected_chord, 
-            question_type, 
-            chord_type
+        self,
+        chord_answer: Chord,
+        selected_chord: Chord,
+        question_type: QuestionType,
+        chord_type: ChordType
     ) -> bool:
         """
         Checks if the provided answer is correct for the current question.
@@ -139,20 +148,20 @@ class CircleOfFifths:
             bool: True if the answer is correct, False otherwise.
         """
         potential_answers = self.get_next_chord(
-            selected_chord, question_type, chord_type == ChordType.MAJOR
+            selected_chord, question_type, chord_type
         )
         return chord_answer in potential_answers
 
-    def get_neighbor_indices(self, chord_list, chord):
+    def get_neighbor_indices(self, chord_list: List[Chord], chord: Chord) -> List[int]:
         """
         Returns the indices of the neighbors (clockwise and counterclockwise) of the given chord.
 
         Args:
-            chord_list (list): The list of chords (major or minor).
+            chord_list (List[Chord]): The list of chords (major or minor).
             chord (Chord): The chord whose neighbors to find.
 
         Returns:
-            list: Indices of the neighbor chords.
+            List[int]: Indices of the neighbor chords.
         """
         n = len(chord_list)
         try:
@@ -161,12 +170,17 @@ class CircleOfFifths:
             return []
         return [(idx - 1) % n, (idx + 1) % n]
 
-    def is_neighbor(self, chord_list, chord, maybe_neighbor):
+    def is_neighbor(
+        self,
+        chord_list: List[Chord],
+        chord: Chord,
+        maybe_neighbor: Chord
+    ) -> bool:
         """
         Checks if maybe_neighbor is a neighbor (clockwise or counterclockwise) of chord.
 
         Args:
-            chord_list (list): The list of chords (major or minor).
+            chord_list (List[Chord]): The list of chords (major or minor).
             chord (Chord): The reference chord.
             maybe_neighbor (Chord): The chord to check.
 
@@ -180,4 +194,4 @@ class CircleOfFifths:
             return chord_list.index(maybe_neighbor) in neighbor_indices
         except ValueError:
             return False
-    
+
