@@ -1,0 +1,22 @@
+{
+    "question_fill_in": "What is the name of the {chord_type} chord at {hour} o'clock?",
+    "question_clockwise": "What is the chord clockwise from the chord {chord}?",
+    "question_counterclockwise": "What is the chord counterclockwise from the chord {chord}?",
+    "question_alternative_circle": "What is the alternative circle chord for the chord {chord}?",
+    "question_any": "What is the name of any neighbor chord {chord}?",
+
+    "feedback_correct_fill_in": "Correct! {answer} is the correct answer.",
+    "feedback_correct_alternative_circle": "Correct! {answer} is the next chord in the alternative circle direction from {selected}.",
+    "feedback_correct_any": "Correct! {answer} is a neighbor chord of {selected}.",
+    "feedback_correct_clockwise": "Correct! {answer} is the next chord in the clockwise direction from {selected}.",
+    "feedback_correct_counterclockwise": "Correct! {answer} is the next chord in the counterclockwise direction from {selected}.",
+
+    "feedback_incorrect_fill_in": "No. {answer} is not the correct answer. Correct answer is {correct}.",
+    "feedback_incorrect_alternative_circle": "No. {answer} is not the next chord in the alternative circle direction from {selected}.",
+    "feedback_incorrect_any": "No. {answer} is not a neighbor chord of {selected}.",
+    "feedback_incorrect_clockwise": "No. {answer} is not the next chord in the clockwise direction from {selected}.",
+    "feedback_incorrect_counterclockwise": "No. {answer} is not the next chord in the counterclockwise direction from {selected}.",
+
+    "major": "major",
+    "minor": "minor"
+}

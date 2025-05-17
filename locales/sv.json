@@ -1,0 +1,22 @@
+{
+    "question_fill_in": "Vad heter {chord_type}-ackordet klockan {hour}?",
+    "question_clockwise": "Vilket ackord är medurs från {chord}?",
+    "question_counterclockwise": "Vilket ackord är moturs från {chord}?",
+    "question_alternative_circle": "Vilket är det alternativa cirkelackordet för {chord}?",
+    "question_any": "Vad heter något grannackord till {chord}?",
+
+    "feedback_correct_fill_in": "Rätt! {answer} är rätt svar.",
+    "feedback_correct_alternative_circle": "Rätt! {answer} är nästa ackord i den alternativa cirkeln från {selected}.",
+    "feedback_correct_any": "Rätt! {answer} är ett grannackord till {selected}.",
+    "feedback_correct_clockwise": "Rätt! {answer} är nästa ackord medurs från {selected}.",
+    "feedback_correct_counterclockwise": "Rätt! {answer} är nästa ackord moturs från {selected}.",
+
+    "feedback_incorrect_fill_in": "Nej. {answer} är inte rätt svar. Rätt svar är {correct}.",
+    "feedback_incorrect_alternative_circle": "Nej. {answer} är inte nästa ackord i den alternativa cirkeln från {selected}.",
+    "feedback_incorrect_any": "Nej. {answer} är inte ett grannackord till {selected}.",
+    "feedback_incorrect_clockwise": "Nej. {answer} är inte nästa ackord medurs från {selected}.",
+    "feedback_incorrect_counterclockwise": "Nej. {answer} är inte nästa ackord moturs från {selected}.",
+
+    "major": "dur",
+    "minor": "moll"
+}

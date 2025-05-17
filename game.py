@@ -4,6 +4,7 @@ from circle import CircleOfFifths, QuestionType, ChordType
 from render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
+from localization import Localization
 
 class GameState(Enum):
     ACTIVE = 1
@@ -12,7 +13,7 @@ class GameState(Enum):
 
 class CircleOfFifthsGame:
 
-    def __init__(self):
+    def __init__(self, lang="en"):
         self.screen = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
         self.overlay = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
         pygame.display.set_caption("Circle of Fifths Quiz")
@@ -20,6 +21,8 @@ class CircleOfFifthsGame:
 
         self.font_small = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
         self.font_large = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+
+        self.loc = Localization(lang)
 
         self.circle = CircleOfFifths()
         self.circle_render = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
@@ -154,34 +157,49 @@ class CircleOfFifthsGame:
     def generate_question_text(self):
         chord_list = self.circle.get_chord_list(self.chord_type)
         selected_index = chord_list.index(self.selected_chord)
-        templates = {
-            QuestionType.FILL_IN: lambda: f"What is the name of the {'major' if self.chord_type == ChordType.MAJOR else 'minor'} chord at {(selected_index + 11) % 12 + 1} o'clock?",
-            QuestionType.CLOCKWISE: lambda: f"What is the chord clockwise from the chord {self.selected_chord}?",
-            QuestionType.COUNTERCLOCKWISE: lambda: f"What is the chord counterclockwise from the chord {self.selected_chord}?",
-            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"What is the alternative circle chord for the chord {self.selected_chord}?",
-            QuestionType.ANY: lambda: f"What is the name of any neighbor chord {self.selected_chord}?",
+        chord_type_str = self.loc.t("major") if self.chord_type == ChordType.MAJOR else self.loc.t("minor")
+        hour = (selected_index + 11) % 12 + 1
+        chord_str = str(self.selected_chord)
+
+        question_keys = {
+            QuestionType.FILL_IN: "question_fill_in",
+            QuestionType.CLOCKWISE: "question_clockwise",
+            QuestionType.COUNTERCLOCKWISE: "question_counterclockwise",
+            QuestionType.ALTERNATIVE_CIRCLE: "question_alternative_circle",
+            QuestionType.ANY: "question_any",
         }
-        return templates.get(self.question, lambda: "Unknown question type")()
+        key = question_keys.get(self.question, "question_fill_in")
+        return self.loc.t(
+            key,
+            chord_type=chord_type_str,
+            hour=hour,
+            chord=chord_str
+        )
 
     def get_feedback_message(self, is_correct, chord_answer, selected_chord, question_type):
-        if is_correct:
-            correct_msgs = {
-                QuestionType.FILL_IN:      f"Correct! {chord_answer} is the correct answer.",
-                QuestionType.ALTERNATIVE_CIRCLE: f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}.",
-                QuestionType.ANY:          f"Correct! {chord_answer} is a neighbor chord of {selected_chord}.",
-                QuestionType.CLOCKWISE:    f"Correct! {chord_answer} is the next chord in the clockwise direction from {selected_chord}.",
-                QuestionType.COUNTERCLOCKWISE: f"Correct! {chord_answer} is the next chord in the counterclockwise direction from {selected_chord}.",
-            }
-            return correct_msgs.get(question_type, "Correct!")
-        else:
-            incorrect_msgs = {
-                QuestionType.FILL_IN:      f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}.",
-                QuestionType.ALTERNATIVE_CIRCLE: f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}.",
-                QuestionType.ANY:          f"No. {chord_answer} is not a neighbor chord of {selected_chord}.",
-                QuestionType.CLOCKWISE:    f"No. {chord_answer} is not the next chord in the clockwise direction from {selected_chord}.",
-                QuestionType.COUNTERCLOCKWISE: f"No. {chord_answer} is not the next chord in the counterclockwise direction from {selected_chord}.",
-            }
-            return incorrect_msgs.get(question_type, "No.")
+        chord_str = str(selected_chord)
+        answer_str = str(chord_answer)
+        correct_str = selected_chord.name
+
+        feedback_keys = {
+            (True, QuestionType.FILL_IN): "feedback_correct_fill_in",
+            (True, QuestionType.ALTERNATIVE_CIRCLE): "feedback_correct_alternative_circle",
+            (True, QuestionType.ANY): "feedback_correct_any",
+            (True, QuestionType.CLOCKWISE): "feedback_correct_clockwise",
+            (True, QuestionType.COUNTERCLOCKWISE): "feedback_correct_counterclockwise",
+            (False, QuestionType.FILL_IN): "feedback_incorrect_fill_in",
+            (False, QuestionType.ALTERNATIVE_CIRCLE): "feedback_incorrect_alternative_circle",
+            (False, QuestionType.ANY): "feedback_incorrect_any",
+            (False, QuestionType.CLOCKWISE): "feedback_incorrect_clockwise",
+            (False, QuestionType.COUNTERCLOCKWISE): "feedback_incorrect_counterclockwise",
+        }
+        key = feedback_keys.get((is_correct, question_type), "feedback_correct_fill_in" if is_correct else "feedback_incorrect_fill_in")
+        return self.loc.t(
+            key,
+            answer=answer_str,
+            selected=chord_str,
+            correct=correct_str
+        )
 
     def run(self):
         while True:
