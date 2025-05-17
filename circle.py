@@ -119,7 +119,13 @@ class CircleOfFifths:
         else:  # ANY
             return [chord_list[(idx + 1) % n], chord_list[(idx - 1) % n], alt_list[idx]]
         
-    def check_answer(self, chord_answer, selected_chord, question_type, chord_type):
+    def check_answer(
+            self, 
+            chord_answer, 
+            selected_chord, 
+            question_type, 
+            chord_type
+    ) -> tuple[bool, str]:
         """
         Checks if the provided answer is correct for the current question.
 
@@ -132,23 +138,33 @@ class CircleOfFifths:
         Returns:
             tuple: (bool, str) indicating if the answer is correct and a feedback message.
         """
-        potential_answers = self.get_next_chord(selected_chord, question_type, chord_type == ChordType.MAJOR)
-        if chord_answer in potential_answers:
-            if question_type == QuestionType.FILL_IN:
-                return True, f"Correct! {chord_answer} is the correct answer."
-            elif question_type == QuestionType.ALTERNATIVE_CIRCLE:
-                return True, f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}."
-            elif question_type == QuestionType.ANY:
-                return True, f"Correct! {chord_answer} is a neighbor chord of {selected_chord}."
-            return True, f"Correct! {chord_answer} is the next chord in the {question_type.name.lower()} direction from {selected_chord}."
-        else:
-            if question_type == QuestionType.FILL_IN:
-                return False, f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}."
-            elif question_type == QuestionType.ALTERNATIVE_CIRCLE:
-                return False, f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}."
-            elif question_type == QuestionType.ANY:
-                return False, f"No. {chord_answer} is not a neighbor chord of {selected_chord}."
-            return False, f"No. {chord_answer} is not the next chord in the {question_type.name.lower()} direction from {selected_chord}."
+        potential_answers = self.get_next_chord(
+            selected_chord, question_type, chord_type == ChordType.MAJOR
+        )
+        is_correct = chord_answer in potential_answers
+
+        # Feedback templates for correct and incorrect answers
+        correct_msgs = {
+            QuestionType.FILL_IN:      lambda: f"Correct! {chord_answer} is the correct answer.",
+            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}.",
+            QuestionType.ANY:          lambda: f"Correct! {chord_answer} is a neighbor chord of {selected_chord}.",
+            QuestionType.CLOCKWISE:    lambda: f"Correct! {chord_answer} is the next chord in the clockwise direction from {selected_chord}.",
+            QuestionType.COUNTERCLOCKWISE: lambda: f"Correct! {chord_answer} is the next chord in the counterclockwise direction from {selected_chord}.",
+        }
+        incorrect_msgs = {
+            QuestionType.FILL_IN:      lambda: f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}.",
+            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}.",
+            QuestionType.ANY:          lambda: f"No. {chord_answer} is not a neighbor chord of {selected_chord}.",
+            QuestionType.CLOCKWISE:    lambda: f"No. {chord_answer} is not the next chord in the clockwise direction from {selected_chord}.",
+            QuestionType.COUNTERCLOCKWISE: lambda: f"No. {chord_answer} is not the next chord in the counterclockwise direction from {selected_chord}.",
+        }
+
+        msg = (
+            correct_msgs.get(question_type, lambda: "Correct!")( )
+            if is_correct
+            else incorrect_msgs.get(question_type, lambda: "No.")( )
+        )
+        return is_correct, msg
 
     def get_neighbor_indices(self, chord_list, chord):
         """
