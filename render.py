@@ -144,4 +144,3 @@ class CircleOfFifthsDrawable:
         index = self.majorChords.index(chord) if chord_type == ChordType.MAJOR else self.minorChords.index(chord)
         polygon_list = self.segments_polygons if chord_type == ChordType.MAJOR else self.inner_segments_polygons
         pygame.draw.polygon(surface, color, polygon_list[index])
-        
