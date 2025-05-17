@@ -76,11 +76,14 @@ class CircleOfFifthsGame:
             if chord_answer is None:
                 self.result_text = f"{self.input_text} is not a valid chord."
             else:
-                was_correct, self.result_text = self.circle.check_answer(
+                is_correct = self.circle.check_answer(
                     chord_answer, self.selected_chord, self.question, self.chord_type
                 )
+                self.result_text = self.get_feedback_message(
+                    is_correct, chord_answer, self.selected_chord, self.question
+                )
                 self.total_questions += 1
-                if was_correct:
+                if is_correct:
                     self.correct_answers += 1
         else:
             self.input_text += event.unicode
@@ -159,6 +162,26 @@ class CircleOfFifthsGame:
             QuestionType.ANY: lambda: f"What is the name of any neighbor chord {self.selected_chord}?",
         }
         return templates.get(self.question, lambda: "Unknown question type")()
+
+    def get_feedback_message(self, is_correct, chord_answer, selected_chord, question_type):
+        if is_correct:
+            correct_msgs = {
+                QuestionType.FILL_IN:      f"Correct! {chord_answer} is the correct answer.",
+                QuestionType.ALTERNATIVE_CIRCLE: f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}.",
+                QuestionType.ANY:          f"Correct! {chord_answer} is a neighbor chord of {selected_chord}.",
+                QuestionType.CLOCKWISE:    f"Correct! {chord_answer} is the next chord in the clockwise direction from {selected_chord}.",
+                QuestionType.COUNTERCLOCKWISE: f"Correct! {chord_answer} is the next chord in the counterclockwise direction from {selected_chord}.",
+            }
+            return correct_msgs.get(question_type, "Correct!")
+        else:
+            incorrect_msgs = {
+                QuestionType.FILL_IN:      f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}.",
+                QuestionType.ALTERNATIVE_CIRCLE: f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}.",
+                QuestionType.ANY:          f"No. {chord_answer} is not a neighbor chord of {selected_chord}.",
+                QuestionType.CLOCKWISE:    f"No. {chord_answer} is not the next chord in the clockwise direction from {selected_chord}.",
+                QuestionType.COUNTERCLOCKWISE: f"No. {chord_answer} is not the next chord in the counterclockwise direction from {selected_chord}.",
+            }
+            return incorrect_msgs.get(question_type, "No.")
 
     def run(self):
         while True:

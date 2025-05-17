@@ -125,7 +125,7 @@ class CircleOfFifths:
             selected_chord, 
             question_type, 
             chord_type
-    ) -> tuple[bool, str]:
+    ) -> bool:
         """
         Checks if the provided answer is correct for the current question.
 
@@ -136,35 +136,12 @@ class CircleOfFifths:
             chord_type (ChordType): The type of chord (major or minor).
 
         Returns:
-            tuple: (bool, str) indicating if the answer is correct and a feedback message.
+            bool: True if the answer is correct, False otherwise.
         """
         potential_answers = self.get_next_chord(
             selected_chord, question_type, chord_type == ChordType.MAJOR
         )
-        is_correct = chord_answer in potential_answers
-
-        # Feedback templates for correct and incorrect answers
-        correct_msgs = {
-            QuestionType.FILL_IN:      lambda: f"Correct! {chord_answer} is the correct answer.",
-            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"Correct! {chord_answer} is the next chord in the alternative circle direction from {selected_chord}.",
-            QuestionType.ANY:          lambda: f"Correct! {chord_answer} is a neighbor chord of {selected_chord}.",
-            QuestionType.CLOCKWISE:    lambda: f"Correct! {chord_answer} is the next chord in the clockwise direction from {selected_chord}.",
-            QuestionType.COUNTERCLOCKWISE: lambda: f"Correct! {chord_answer} is the next chord in the counterclockwise direction from {selected_chord}.",
-        }
-        incorrect_msgs = {
-            QuestionType.FILL_IN:      lambda: f"No. {chord_answer} is not the correct answer. Correct answer is {selected_chord.name}.",
-            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"No. {chord_answer} is not the next chord in the alternative circle direction from {selected_chord}.",
-            QuestionType.ANY:          lambda: f"No. {chord_answer} is not a neighbor chord of {selected_chord}.",
-            QuestionType.CLOCKWISE:    lambda: f"No. {chord_answer} is not the next chord in the clockwise direction from {selected_chord}.",
-            QuestionType.COUNTERCLOCKWISE: lambda: f"No. {chord_answer} is not the next chord in the counterclockwise direction from {selected_chord}.",
-        }
-
-        msg = (
-            correct_msgs.get(question_type, lambda: "Correct!")( )
-            if is_correct
-            else incorrect_msgs.get(question_type, lambda: "No.")( )
-        )
-        return is_correct, msg
+        return chord_answer in potential_answers
 
     def get_neighbor_indices(self, chord_list, chord):
         """
