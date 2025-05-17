@@ -28,7 +28,7 @@ class CircleOfFifthsGame:
         self.circle_render = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
         self.circle_render.set_center((400, 360))
 
-        self.number_of_chords_to_ask_about = 1
+        self.selected_chord_indices = set(range(len(self.circle.get_chord_list(ChordType.MAJOR))))
         self.correct_answers = 0
         self.total_questions = 0
         self.input_text = ""
@@ -43,8 +43,9 @@ class CircleOfFifthsGame:
     def new_question(self):
         question = QuestionType.FILL_IN
         chord_type = random.choice([ChordType.MAJOR, ChordType.MINOR])
-        selected_list = self.circle.get_chord_list(chord_type)
-        selected_chord = random.choice(selected_list[:self.number_of_chords_to_ask_about])
+        chord_list = self.circle.get_chord_list(chord_type)
+        available_chords = [chord_list[i] for i in self.selected_chord_indices]
+        selected_chord = random.choice(available_chords)
         return question, selected_chord, chord_type
 
     def handle_events(self):
@@ -58,10 +59,6 @@ class CircleOfFifthsGame:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
-                elif event.key == pygame.K_PLUS:
-                    self.number_of_chords_to_ask_about = min(self.number_of_chords_to_ask_about + 1, 12)
-                elif event.key == pygame.K_MINUS:
-                    self.number_of_chords_to_ask_about = max(self.number_of_chords_to_ask_about - 1, 1)
                 elif self.state == GameState.ACTIVE:
                     self.handle_input(event)
                 elif self.state == GameState.INACTIVE and event.key == pygame.K_RETURN:
@@ -69,6 +66,18 @@ class CircleOfFifthsGame:
 
             if self.state == GameState.ADVANCE and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.reset_for_next_question()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.circle_render.is_inside_circle(mouse_pos):
+                        selected_chord_index = self.circle_render.get_chord_index(mouse_pos)
+                        if selected_chord_index is not None:
+                            if selected_chord_index in self.selected_chord_indices:
+                                self.selected_chord_indices.remove(selected_chord_index)
+                            else:
+                                self.selected_chord_indices.add(selected_chord_index)
+                            self.redraw = True
 
     def handle_input(self, event):
         if event.key == pygame.K_BACKSPACE:
@@ -114,7 +123,7 @@ class CircleOfFifthsGame:
         self.screen.fill(Config.COLORS["background"])
         self.overlay.fill((0, 0, 0, 0))
 
-        self.circle_render.draw_circle(self.screen)
+        self.circle_render.draw_circle(self.screen, self.selected_chord_indices)
         self.circle_render.draw_highlighted_chord(self.overlay, self.selected_chord, self.chord_type, self.blink)
         if self.state != GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
@@ -144,15 +153,10 @@ class CircleOfFifthsGame:
             self.screen.blit(result_surface, result_text_rect)
 
     def render_stats(self):
-        range_surface = self.font_small.render(
-            f"Range: {self.number_of_chords_to_ask_about}", True, Config.COLORS["text"]
-        )
-        self.screen.blit(range_surface, (700, 20))
-
         answers_surface = self.font_small.render(
             f"{self.correct_answers} / {self.total_questions}", True, Config.COLORS["text"]
         )
-        self.screen.blit(answers_surface, (700, 50))
+        self.screen.blit(answers_surface, (700, 20))
 
     def generate_question_text(self):
         chord_list = self.circle.get_chord_list(self.chord_type)

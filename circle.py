@@ -180,3 +180,4 @@ class CircleOfFifths:
             return chord_list.index(maybe_neighbor) in neighbor_indices
         except ValueError:
             return False
+    

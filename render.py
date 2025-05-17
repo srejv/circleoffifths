@@ -5,9 +5,10 @@ import colorsys
 from circle import ChordType
 
 # Color generator using HSV for smooth variation
-def hsv_color(i, total):
+def hsv_color(i, total, selected=False):
     hue = (i % total) / total
-    r, g, b = colorsys.hsv_to_rgb(hue, 0.7, 1.0)
+    saturation = 0.7 if selected else 0.4
+    r, g, b = colorsys.hsv_to_rgb(hue, saturation, 1.0)
     return (int(r * 255), int(g * 255), int(b * 255))
 
 # Convert polar coordinates to cartesian
@@ -106,16 +107,16 @@ class CircleOfFifthsDrawable:
         return points
 
 
-    def draw_circle(self, surface):
+    def draw_circle(self, surface, selected_chord_indices):
         """
         Draws the circle of fifths on the given surface.
         :param surface: The surface to draw on.
         """
         for i, poly in enumerate(self.segments_polygons):
-            color = hsv_color(i, self.SEGMENTS)
+            color = hsv_color(i, self.SEGMENTS, i in selected_chord_indices)
             pygame.draw.polygon(surface, color, poly)
         for i, poly in enumerate(self.inner_segments_polygons):
-            color = hsv_color(i-3, self.SEGMENTS)
+            color = hsv_color(i-3, self.SEGMENTS, i in selected_chord_indices)
             pygame.draw.polygon(surface, color, poly)
 
         # Draw the border circle
@@ -144,3 +145,38 @@ class CircleOfFifthsDrawable:
         index = self.majorChords.index(chord) if chord_type == ChordType.MAJOR else self.minorChords.index(chord)
         polygon_list = self.segments_polygons if chord_type == ChordType.MAJOR else self.inner_segments_polygons
         pygame.draw.polygon(surface, color, polygon_list[index])
+
+    def is_inside_circle(self, point):
+        """
+        Checks if a point is inside the circle of fifths.
+
+        Args:
+            point (tuple): The (x, y) coordinates of the point.
+
+        Returns:
+            bool: True if the point is inside the circle, False otherwise.
+        """
+        x, y = point
+        return (x - self.CENTER[0])**2 + (y - self.CENTER[1])**2 <= self.RADIUS**2
+    
+    def get_chord_index(self, point):
+        """
+        Returns the index of the chord at the given point in the circle.
+
+        Args:
+            point (tuple): The (x, y) coordinates of the point.
+
+        Returns:
+            int: The index of the chord, or None if not found.
+        """
+        x, y = point
+        segment_size = 360 / self.SEGMENTS
+        angle = math.degrees(math.atan2(y - self.CENTER[1], x - self.CENTER[0])) % 360
+        angle = angle + 90 + segment_size/2
+        if angle < 0:
+            angle += 360
+        if angle > 360:
+            angle -= 360
+
+        index = int(angle // segment_size)
+        return index
