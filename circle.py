@@ -69,6 +69,7 @@ class CircleOfFifths:
 
     def get_next_chord(self, chord, direction, is_major=True):
         chord_list = self.majorChords if is_major else self.minorChords
+        alt_list = self.minorChords if is_major else self.majorChords
         n = len(chord_list)
         try:
             idx = chord_list.index(chord)
@@ -81,10 +82,8 @@ class CircleOfFifths:
         elif direction == QuestionType.COUNTERCLOCKWISE:
             return [chord_list[(idx - 1) % n]]
         elif direction == QuestionType.ALTERNATIVE_CIRCLE:
-            alt_list = self.minorChords if is_major else self.majorChords
             return [alt_list[idx]]
         else:  # ANY
-            alt_list = self.minorChords if is_major else self.majorChords
             return [chord_list[(idx + 1) % n], chord_list[(idx - 1) % n], alt_list[idx]]
         
     def check_answer(self, chord_answer, selected_chord, question_type, chord_type):
