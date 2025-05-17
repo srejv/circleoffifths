@@ -1,46 +1,68 @@
 import pygame
 import random
+from typing import Set, Tuple, Optional
 from core.circle import CircleOfFifths, QuestionType, ChordType
+from core.chord import Chord
 from ui.render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
 from localization import Localization
 
 class GameState(Enum):
+    """Enumeration for the different game states."""
     ACTIVE = 1
     INACTIVE = 2
     ADVANCE = 3
 
 class CircleOfFifthsGame:
+    """
+    Main game class for the Circle of Fifths Practice App.
+    Handles game state, event processing, rendering, and quiz logic.
+    """
 
-    def __init__(self, lang="en"):
-        self.screen = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
-        self.overlay = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
+    def __init__(self, lang: str = "en") -> None:
+        """
+        Initializes the game, pygame, and all game state.
+
+        Args:
+            lang (str): Language code for localization (default "en").
+        """
+        self.screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+        self.overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
         pygame.display.set_caption("Circle of Fifths Quiz")
-        self.clock = pygame.time.Clock()
+        self.clock: pygame.time.Clock = pygame.time.Clock()
 
-        self.font_small = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
-        self.font_large = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+        self.font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
+        self.font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
 
-        self.loc = Localization(lang)
+        self.loc: Localization = Localization(lang)
 
-        self.circle = CircleOfFifths()
-        self.circle_render = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
+        self.circle: CircleOfFifths = CircleOfFifths()
+        self.circle_render: CircleOfFifthsDrawable = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
         self.circle_render.set_center((400, 360))
 
-        self.selected_chord_indices = set(range(len(self.circle.get_chord_list(ChordType.MAJOR))))
-        self.correct_answers = 0
-        self.total_questions = 0
-        self.input_text = ""
-        self.result_text = ""
-        self.state = GameState.ACTIVE
-        self.blink = False
-        self.blink_counter = 0
-        self.redraw = True
+        self.selected_chord_indices: Set[int] = set(range(len(self.circle.get_chord_list(ChordType.MAJOR))))
+        self.correct_answers: int = 0
+        self.total_questions: int = 0
+        self.input_text: str = ""
+        self.result_text: str = ""
+        self.state: GameState = GameState.ACTIVE
+        self.blink: bool = False
+        self.blink_counter: int = 0
+        self.redraw: bool = True
 
+        self.question: QuestionType
+        self.selected_chord: Chord
+        self.chord_type: ChordType
         self.question, self.selected_chord, self.chord_type = self.new_question()
 
-    def new_question(self):
+    def new_question(self) -> Tuple[QuestionType, Chord, ChordType]:
+        """
+        Generates a new quiz question and selects a chord from the selected indices.
+
+        Returns:
+            Tuple[QuestionType, Chord, ChordType]: The question type, selected chord, and chord type.
+        """
         question = QuestionType.FILL_IN
         chord_type = random.choice([ChordType.MAJOR, ChordType.MINOR])
         chord_list = self.circle.get_chord_list(chord_type)
@@ -48,7 +70,10 @@ class CircleOfFifthsGame:
         selected_chord = random.choice(available_chords)
         return question, selected_chord, chord_type
 
-    def handle_events(self):
+    def handle_events(self) -> None:
+        """
+        Handles all pygame events, including keyboard and mouse input.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -79,7 +104,13 @@ class CircleOfFifthsGame:
                                 self.selected_chord_indices.add(selected_chord_index)
                             self.redraw = True
 
-    def handle_input(self, event):
+    def handle_input(self, event: pygame.event.Event) -> None:
+        """
+        Handles keyboard input for answering questions.
+
+        Args:
+            event (pygame.event.Event): The pygame event to process.
+        """
         if event.key == pygame.K_BACKSPACE:
             self.input_text = self.input_text[:-1]
         elif event.key == pygame.K_RETURN:
@@ -100,7 +131,10 @@ class CircleOfFifthsGame:
         else:
             self.input_text += event.unicode
 
-    def reset_for_next_question(self):
+    def reset_for_next_question(self) -> None:
+        """
+        Resets the state for the next quiz question.
+        """
         self.input_text = ""
         self.result_text = ""
         self.question, self.selected_chord, self.chord_type = self.new_question()
@@ -108,14 +142,20 @@ class CircleOfFifthsGame:
         self.blink = False
         self.blink_counter = 0
 
-    def update_blink(self):
+    def update_blink(self) -> None:
+        """
+        Updates the blink state for UI effects.
+        """
         self.blink_counter += 1
         if self.blink_counter > 30:
             self.blink = not self.blink
             self.blink_counter = 0
             self.redraw = True
 
-    def render(self):
+    def render(self) -> None:
+        """
+        Renders the game screen and overlays.
+        """
         if not self.redraw:
             return
 
@@ -136,29 +176,47 @@ class CircleOfFifthsGame:
 
         pygame.display.flip()
 
-    def render_question(self):
+    def render_question(self) -> None:
+        """
+        Renders the current quiz question at the top of the screen.
+        """
         question_surface = self.font_small.render(self.generate_question_text(), True, Config.COLORS["text"])
         question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
-    def render_input(self):
+    def render_input(self) -> None:
+        """
+        Renders the user's current input.
+        """
         input_surface = self.font_large.render(self.input_text, True, Config.COLORS["text"])
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
-    def render_results(self):
+    def render_results(self) -> None:
+        """
+        Renders the result/feedback message after an answer is submitted.
+        """
         if self.state != GameState.ACTIVE:
             result_surface = self.font_small.render(self.result_text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
 
-    def render_stats(self):
+    def render_stats(self) -> None:
+        """
+        Renders the user's score and statistics.
+        """
         answers_surface = self.font_small.render(
             f"{self.correct_answers} / {self.total_questions}", True, Config.COLORS["text"]
         )
         self.screen.blit(answers_surface, (700, 20))
 
-    def generate_question_text(self):
+    def generate_question_text(self) -> str:
+        """
+        Generates the localized question text for the current quiz question.
+
+        Returns:
+            str: The localized question string.
+        """
         chord_list = self.circle.get_chord_list(self.chord_type)
         selected_index = chord_list.index(self.selected_chord)
         chord_type_str = self.loc.t("major") if self.chord_type == ChordType.MAJOR else self.loc.t("minor")
@@ -180,7 +238,25 @@ class CircleOfFifthsGame:
             chord=chord_str
         )
 
-    def get_feedback_message(self, is_correct, chord_answer, selected_chord, question_type):
+    def get_feedback_message(
+        self,
+        is_correct: bool,
+        chord_answer: Chord,
+        selected_chord: Chord,
+        question_type: QuestionType
+    ) -> str:
+        """
+        Generates the localized feedback message for the user's answer.
+
+        Args:
+            is_correct (bool): Whether the answer was correct.
+            chord_answer (Chord): The user's answer.
+            selected_chord (Chord): The correct chord.
+            question_type (QuestionType): The type of question.
+
+        Returns:
+            str: The localized feedback message.
+        """
         chord_str = str(selected_chord)
         answer_str = str(chord_answer)
         correct_str = selected_chord.name
@@ -205,7 +281,10 @@ class CircleOfFifthsGame:
             correct=correct_str
         )
 
-    def run(self):
+    def run(self) -> None:
+        """
+        Main game loop.
+        """
         while True:
             self.handle_events()
             self.update_blink()
