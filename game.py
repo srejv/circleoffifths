@@ -143,19 +143,14 @@ class CircleOfFifthsGame:
         pygame.display.flip()
 
     def generate_question_text(self):
-        if self.question == QuestionType.FILL_IN:
-            if self.chord_type == ChordType.MAJOR:
-                return f"What is the name of the major chord at {(self.selected_chord.index + 11) % 12 + 1} o'clock?"
-            else:
-                return f"What is the name of the minor chord at {(self.selected_chord.index + 11) % 12 + 1} o'clock?"
-        elif self.question == QuestionType.CLOCKWISE:
-            return f"What is the chord clockwise from the chord {self.selected_chord}?"
-        elif self.question == QuestionType.COUNTERCLOCKWISE:
-            return f"What is the chord counterclockwise from the chord {self.selected_chord}?"
-        elif self.question == QuestionType.ALTERNATIVE_CIRCLE:
-            return f"What is the alternative circle chord for the chord {self.selected_chord}?"
-        else:
-            return f"What is the name of any neighbor chord {self.selected_chord}?"
+        templates = {
+            QuestionType.FILL_IN: lambda: f"What is the name of the {'major' if self.chord_type == ChordType.MAJOR else 'minor'} chord at {(self.selected_chord.index + 11) % 12 + 1} o'clock?",
+            QuestionType.CLOCKWISE: lambda: f"What is the chord clockwise from the chord {self.selected_chord}?",
+            QuestionType.COUNTERCLOCKWISE: lambda: f"What is the chord counterclockwise from the chord {self.selected_chord}?",
+            QuestionType.ALTERNATIVE_CIRCLE: lambda: f"What is the alternative circle chord for the chord {self.selected_chord}?",
+            QuestionType.ANY: lambda: f"What is the name of any neighbor chord {self.selected_chord}?",
+        }
+        return templates.get(self.question, lambda: "Unknown question type")()
 
     def run(self):
         while True:
