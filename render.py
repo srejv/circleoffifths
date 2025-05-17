@@ -3,10 +3,12 @@ import math
 import colorsys
 
 from circle import ChordType
+from typing import Tuple
+
 
 # Color generator using HSV for smooth variation
 def hsv_color(i, total):
-    hue = i / total
+    hue = (i % total) / total
     r, g, b = colorsys.hsv_to_rgb(hue, 0.7, 1.0)
     return (int(r * 255), int(g * 255), int(b * 255))
 
@@ -39,47 +41,17 @@ class CircleOfFifthsDrawable:
         self.COLOR_BLACK = (30, 30, 30)
         self.COLOR_WHITE = (220, 220, 220)
 
+        self.segments_polygons = []
+        self.inner_segments_polygons = []
+        self.precalculate_wedges()
+
     def set_center(self, center):
         """
         Set the center of the circle.
         :param center: Tuple (x, y) representing the center of the circle.
         """
         self.CENTER = center
-
-    def _draw_segment(self, surface, angle_start, angle_end, color, outer_radius, inner_radius):
-        """
-        Draws a segment of the circle between two angles.
-        :param surface: The surface to draw on.
-        :param angle_start: Starting angle in degrees.
-        :param angle_end: Ending angle in degrees.
-        :param color: Color of the segment.
-        :param outer_radius: Outer radius of the segment.
-        :param inner_radius: Inner radius of the segment.
-        """
-        # Create a wedge as a polygon
-        # TODO: Could precalculate the polygons because they are static
-        points = [polar_to_cartesian(self.CENTER, angle_start, inner_radius)]
-        for angle in range(int(angle_start), int(angle_end) + 1, 2):  # Outer arc
-            points.append(polar_to_cartesian(self.CENTER, angle, outer_radius))
-        for angle in range(int(angle_end), int(angle_start) - 1, -2):  # Inner arc (reversed)
-            points.append(polar_to_cartesian(self.CENTER, angle, inner_radius))
-        pygame.draw.polygon(surface, color, points)
-
-    def _draw_segments(self, surface, outer_radius, inner_radius, alt=0):
-        """
-        Draws the segments of the circle.
-        :param surface: The surface to draw on.
-        :param outer_radius: Outer radius of the segments.
-        :param inner_radius: Inner radius of the segments.
-        :param alt: Offset for the color hue.
-        """
-        for i in range(self.SEGMENTS):
-            angle_start = -90 + i * (360 / self.SEGMENTS) - 360/(self.SEGMENTS*2)
-            angle_end = angle_start + (360 / self.SEGMENTS)
-            color = hsv_color(i-alt, self.SEGMENTS)
-
-            # Create a wedge as a polygon
-            self._draw_segment(surface, angle_start, angle_end, color, outer_radius, inner_radius)
+        self.precalculate_wedges()
 
     def _draw_lines(self, surface, item_list):
         """
@@ -111,14 +83,42 @@ class CircleOfFifthsDrawable:
             text = self.FONT.render(note.alternative_names[0], True, self.COLOR_BLACK)
             text_rect = text.get_rect(center=text_pos)
             surface.blit(text, text_rect)
+    
+    def precalculate_wedges(self):
+        """Precompute the polygons for the outer and inner wedges."""
+        self.segments_polygons = []
+        self.inner_segments_polygons = []
+        for i in range(self.SEGMENTS):
+            angle_start = -90 + i * (360 / self.SEGMENTS) - 360/(self.SEGMENTS*2)
+            angle_end = angle_start + (360 / self.SEGMENTS)
+            # Outer wedge
+            poly = self._make_wedge_polygon(angle_start, angle_end, self.RADIUS, self.INNER_RADIUS)
+            self.segments_polygons.append(poly)
+            # Inner wedge
+            poly_inner = self._make_wedge_polygon(angle_start, angle_end, self.INNER_RADIUS, self.INNER_OUTER_RADIUS)
+            self.inner_segments_polygons.append(poly_inner)
+
+    def _make_wedge_polygon(self, angle_start, angle_end, outer_radius, inner_radius):
+        """Helper to create a wedge polygon point list."""
+        points = [polar_to_cartesian(self.CENTER, angle_start, inner_radius)]
+        for angle in range(int(angle_start), int(angle_end) + 1, 2):
+            points.append(polar_to_cartesian(self.CENTER, angle, outer_radius))
+        for angle in range(int(angle_end), int(angle_start) - 1, -2):
+            points.append(polar_to_cartesian(self.CENTER, angle, inner_radius))
+        return points
+
 
     def draw_circle(self, surface):
         """
         Draws the circle of fifths on the given surface.
         :param surface: The surface to draw on.
         """
-        self._draw_segments(surface, self.RADIUS, self.INNER_RADIUS)
-        self._draw_segments(surface, self.INNER_RADIUS, self.INNER_OUTER_RADIUS, alt=-3)
+        for i, poly in enumerate(self.segments_polygons):
+            color = hsv_color(i, self.SEGMENTS)
+            pygame.draw.polygon(surface, color, poly)
+        for i, poly in enumerate(self.inner_segments_polygons):
+            color = hsv_color(i-3, self.SEGMENTS)
+            pygame.draw.polygon(surface, color, poly)
 
         # Draw the border circle
         pygame.draw.circle(surface, self.COLOR_WHITE, self.CENTER, self.RADIUS+1, 2)
@@ -142,21 +142,8 @@ class CircleOfFifthsDrawable:
         :param chord: The chord to highlight.
         :param chord_type: The type of chord (major or minor).
         """
-        index = 0
-        inner_radius = self.INNER_RADIUS
-        outer_radius = self.RADIUS
-        color = (255, 255, 255, 220)
-        if blink:
-            color = (0, 0, 0, 0)
-
-        if chord_type == ChordType.MAJOR:
-            index = self.majorChords.index(chord)
-        else:
-            index = self.minorChords.index(chord)
-            inner_radius = self.INNER_OUTER_RADIUS
-            outer_radius = self.INNER_RADIUS
-
-        angle_start = -90 + index * (360 / self.SEGMENTS) - 360/(self.SEGMENTS*2) + 1
-        angle_end = angle_start + (360 / self.SEGMENTS) - 1
-
-        self._draw_segment(surface, angle_start, angle_end, color, outer_radius - 2, inner_radius + 2)
+        color = (255, 255, 255, 220) if not blink else (0, 0, 0, 0)
+        index = self.majorChords.index(chord) if chord_type == ChordType.MAJOR else self.minorChords.index(chord)
+        polygon_list = self.segments_polygons if chord_type == ChordType.MAJOR else self.inner_segments_polygons
+        pygame.draw.polygon(surface, color, polygon_list[index])
+        
