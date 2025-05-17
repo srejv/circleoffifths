@@ -3,8 +3,6 @@ import math
 import colorsys
 
 from circle import ChordType
-from typing import Tuple
-
 
 # Color generator using HSV for smooth variation
 def hsv_color(i, total):
