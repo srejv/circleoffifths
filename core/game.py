@@ -8,6 +8,8 @@ from enum import Enum
 from config import Config
 from localization import Localization
 
+from core.game_core import GameCore
+
 class GameState(Enum):
     """Enumeration for the different game states."""
     ACTIVE = 1
@@ -27,6 +29,10 @@ class CircleOfFifthsGame:
         Args:
             lang (str): Language code for localization (default "en").
         """
+
+        self.core = GameCore()
+        self.core.next_question()
+
         pygame.display.set_caption("Circle of Fifths Quiz")
         self.screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
         self.overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
@@ -50,25 +56,6 @@ class CircleOfFifthsGame:
         self.blink: bool = False
         self.blink_counter: int = 0
         self.redraw: bool = True
-
-        self.question: QuestionType
-        self.selected_chord: Chord
-        self.chord_type: ChordType
-        self.question, self.selected_chord, self.chord_type = self.new_question()
-
-    def new_question(self) -> Tuple[QuestionType, Chord, ChordType]:
-        """
-        Generates a new quiz question and selects a chord from the selected indices.
-
-        Returns:
-            Tuple[QuestionType, Chord, ChordType]: The question type, selected chord, and chord type.
-        """
-        question = QuestionType.FILL_IN
-        chord_type = random.choice([ChordType.MAJOR, ChordType.MINOR])
-        chord_list = self.circle.get_chord_list(chord_type)
-        available_chords = [chord_list[i] for i in self.selected_chord_indices]
-        selected_chord = random.choice(available_chords)
-        return question, selected_chord, chord_type
 
     def handle_events(self) -> None:
         """
@@ -102,6 +89,7 @@ class CircleOfFifthsGame:
                                 self.selected_chord_indices.remove(selected_chord_index)
                             else:
                                 self.selected_chord_indices.add(selected_chord_index)
+                            self.core.set_selected_indices(list(self.selected_chord_indices))
                             self.redraw = True
 
     def handle_input(self, event: pygame.event.Event) -> None:
@@ -115,19 +103,10 @@ class CircleOfFifthsGame:
             self.input_text = self.input_text[:-1]
         elif event.key == pygame.K_RETURN:
             self.state = GameState.INACTIVE
-            chord_answer = self.circle.find_chord(self.input_text)
-            if chord_answer is None:
-                self.result_text = f"{self.input_text} is not a valid chord."
-            else:
-                is_correct = self.circle.check_answer(
-                    chord_answer, self.selected_chord, self.question, self.chord_type
-                )
-                self.result_text = self.get_feedback_message(
-                    is_correct, chord_answer, self.selected_chord, self.question
-                )
-                self.total_questions += 1
-                if is_correct:
-                    self.correct_answers += 1
+            is_correct = self.core.submit_answer(self.input_text)
+            self.total_questions += 1
+            if is_correct:
+                self.correct_answers += 1
         else:
             self.input_text += event.unicode
 
@@ -137,7 +116,7 @@ class CircleOfFifthsGame:
         """
         self.input_text = ""
         self.result_text = ""
-        self.question, self.selected_chord, self.chord_type = self.new_question()
+        self.core.next_question()
         self.state = GameState.ACTIVE
         self.blink = False
         self.blink_counter = 0
@@ -158,29 +137,32 @@ class CircleOfFifthsGame:
         """
         if not self.redraw:
             return
+        
+        state = self.core.get_state()
 
         self.redraw = False
         self.screen.fill(Config.COLORS["background"])
         self.overlay.fill((0, 0, 0, 0))
 
         self.circle_render.draw_circle(self.screen, self.selected_chord_indices)
-        self.circle_render.draw_highlighted_chord(self.overlay, self.selected_chord, self.chord_type, self.blink)
+        if state["current_chord"] is not None:
+            self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink)
         if self.state != GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
 
         self.screen.blit(self.overlay, (0, 0))
-        self.render_question()
+        self.render_question(state)
         self.render_input()
-        self.render_results()
+        self.render_results(state)
         self.render_stats()
 
         pygame.display.flip()
 
-    def render_question(self) -> None:
+    def render_question(self, state) -> None:
         """
         Renders the current quiz question at the top of the screen.
         """
-        question_surface = self.font_small.render(self.generate_question_text(), True, Config.COLORS["text"])
+        question_surface = self.font_small.render(self.generate_question_text(state), True, Config.COLORS["text"])
         question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
@@ -192,12 +174,23 @@ class CircleOfFifthsGame:
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
-    def render_results(self) -> None:
+    def render_results(self, state) -> None:
         """
         Renders the result/feedback message after an answer is submitted.
         """
-        if self.state != GameState.ACTIVE:
-            result_surface = self.font_small.render(self.result_text, True, Config.COLORS["text"])
+        if state.get("last_result") is not None:
+            text = ""
+            if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
+                text = self.loc.t(state["last_result"]["reason"])
+            elif state.get("last_result").get("reason") is None:
+                text = self.get_feedback_message(
+                    state,
+                    state["last_result"]["correct"],
+                    state["last_result"]["answer"],
+                    state["current_chord"],
+                    state["current_question"]
+                )
+            result_surface = self.font_small.render(text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
 
@@ -210,18 +203,18 @@ class CircleOfFifthsGame:
         )
         self.screen.blit(answers_surface, (700, 20))
 
-    def generate_question_text(self) -> str:
+    def generate_question_text(self, state) -> str:
         """
         Generates the localized question text for the current quiz question.
 
         Returns:
             str: The localized question string.
         """
-        chord_list = self.circle.get_chord_list(self.chord_type)
-        selected_index = chord_list.index(self.selected_chord)
-        chord_type_str = self.loc.t("major") if self.chord_type == ChordType.MAJOR else self.loc.t("minor")
+        chord_list = self.circle.get_chord_list(state["chord_type"])
+        selected_index = chord_list.index(state["current_chord"])
+        chord_type_str = self.loc.t("major") if state["chord_type"] == ChordType.MAJOR else self.loc.t("minor")
         hour = (selected_index + 11) % 12 + 1
-        chord_str = str(self.selected_chord)
+        chord_str = str(state["current_chord"])
 
         question_keys = {
             QuestionType.FILL_IN: "question_fill_in",
@@ -230,7 +223,7 @@ class CircleOfFifthsGame:
             QuestionType.ALTERNATIVE_CIRCLE: "question_alternative_circle",
             QuestionType.ANY: "question_any",
         }
-        key = question_keys.get(self.question, "question_fill_in")
+        key = question_keys.get(state["current_question"], "question_fill_in")
         return self.loc.t(
             key,
             chord_type=chord_type_str,
@@ -240,6 +233,7 @@ class CircleOfFifthsGame:
 
     def get_feedback_message(
         self,
+        state,
         is_correct: bool,
         chord_answer: Chord,
         selected_chord: Chord,
@@ -257,7 +251,7 @@ class CircleOfFifthsGame:
         Returns:
             str: The localized feedback message.
         """
-        chord_str = str(selected_chord)
+        chord_str = str(state["current_chord"])
         answer_str = str(chord_answer)
         correct_str = selected_chord.name
 
@@ -273,7 +267,7 @@ class CircleOfFifthsGame:
             (False, QuestionType.CLOCKWISE): "feedback_incorrect_clockwise",
             (False, QuestionType.COUNTERCLOCKWISE): "feedback_incorrect_counterclockwise",
         }
-        key = feedback_keys.get((is_correct, question_type), "feedback_correct_fill_in" if is_correct else "feedback_incorrect_fill_in")
+        key = feedback_keys.get((is_correct, state["current_question"]), "feedback_correct_fill_in" if is_correct else "feedback_incorrect_fill_in")
         return self.loc.t(
             key,
             answer=answer_str,

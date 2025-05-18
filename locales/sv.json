@@ -17,6 +17,8 @@
     "feedback_incorrect_clockwise": "Nej. {answer} är inte nästa ackord medurs från {selected}.",
     "feedback_incorrect_counterclockwise": "Nej. {answer} är inte nästa ackord moturs från {selected}.",
 
+    "not_found": "Inte ett giltigt ackord",
+
     "major": "dur",
     "minor": "moll"
 }

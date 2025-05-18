@@ -17,6 +17,8 @@
     "feedback_incorrect_clockwise": "No. {answer} is not the next chord in the clockwise direction from {selected}.",
     "feedback_incorrect_counterclockwise": "No. {answer} is not the next chord in the counterclockwise direction from {selected}.",
 
+    "not_found": "Not a valid chord",
+
     "major": "major",
     "minor": "minor"
 }
