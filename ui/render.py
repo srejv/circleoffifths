@@ -18,8 +18,9 @@ def hsv_color(i: int, total: int, selected: bool = False) -> Tuple[int, int, int
         Tuple[int, int, int]: The RGB color.
     """
     hue = (i % total) / total
-    saturation = 0.7 if selected else 0.4
-    r, g, b = colorsys.hsv_to_rgb(hue, saturation, 1.0)
+    saturation = 0.7 if selected else 0.3
+    value = 1.0 if selected else 0.5
+    r, g, b = colorsys.hsv_to_rgb(hue, saturation, value)
     return (int(r * 255), int(g * 255), int(b * 255))
 
 def polar_to_cartesian(center: Tuple[int, int], angle_deg: float, radius: float) -> Tuple[int, int]:
