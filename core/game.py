@@ -1,11 +1,8 @@
 import pygame
-from typing import Set
-from core.circle import ChordType
 from ui.render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
 from localization import Localization
-from core.game_text import generate_question_text, get_feedback_message
 from core.game_core import GameCore
 from core.blink_manager import BlinkManager
 from ui.game_renderer import GameRenderer
