@@ -45,8 +45,6 @@ class CircleOfFifthsGame:
         self.circle_render = CircleOfFifthsDrawable(self.core.major_chords, self.core.minor_chords)
         self.circle_render.set_center((400, 360))
 
-        self.correct_answers: int = 0
-        self.total_questions: int = 0
         self.input_text: str = ""
         self.state: GameState = GameState.ACTIVE
         self.redraw: bool = True
@@ -99,10 +97,7 @@ class CircleOfFifthsGame:
             self.input_text = self.input_text[:-1]
         elif event.key == pygame.K_RETURN:
             self.state = GameState.INACTIVE
-            is_correct = self.core.submit_answer(self.input_text)
-            self.total_questions += 1
-            if is_correct:
-                self.correct_answers += 1
+            self.core.submit_answer(self.input_text)
         else:
             self.input_text += event.unicode
 
@@ -170,11 +165,9 @@ class CircleOfFifthsGame:
             self.screen.blit(result_surface, result_text_rect)
 
     def render_stats(self) -> None:
-        """
-        Renders the user's score and statistics.
-        """
+        correct, total = self.core.get_stats()
         answers_surface = self.font_small.render(
-            f"{self.correct_answers} / {self.total_questions}", True, Config.COLORS["text"]
+            f"{correct} / {total}", True, Config.COLORS["text"]
         )
         self.screen.blit(answers_surface, (700, 20))
 

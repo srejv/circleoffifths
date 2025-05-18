@@ -16,6 +16,8 @@ class GameCore:
         self.current_question = None
         self.current_chord = None
         self.last_result = None
+        self.correct_answers: int = 0
+        self.total_questions: int = 0
 
     def set_selected_chord_indices(self, indices: List[int]) -> None:
         self.selected_chord_indices = set(indices)
@@ -40,7 +42,13 @@ class GameCore:
             chord, self.current_chord, self.current_question, self.chord_type
         )
         self.last_result = {"correct": correct, "answer": chord}
+        self.total_questions += 1
+        if correct:
+            self.correct_answers += 1
         return correct
+
+    def get_stats(self):
+        return self.correct_answers, self.total_questions
 
     def get_state(self) -> Dict[str, Any]:
         return {
