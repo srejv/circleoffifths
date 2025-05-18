@@ -39,22 +39,6 @@ This is a practice app for learning and mastering the circle of fifths. The goal
     python main.py
     ```
 
-## Dependency Management
-
-All dependencies are listed in `requirements.txt`.  
-To add a new dependency, install it with pip and update the file:
-
-```bash
-pip install <package>
-pip freeze > requirements.txt
-```
-
-To install all dependencies for this project, use:
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Usage
 
 - **Answer questions** by typing the chord name and pressing Enter.
