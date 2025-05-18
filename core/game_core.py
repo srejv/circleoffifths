@@ -48,7 +48,7 @@ class GameCore:
             "last_result": self.last_result,
         }
 
-    def get_chord_list(self, chord_type: ChordType):
+    def get_chord_list(self, chord_type: ChordType) -> List[Chord]:
         return self.circle.get_chord_list(chord_type)
     
     @property

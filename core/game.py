@@ -1,12 +1,11 @@
 import pygame
 from typing import Set
-from core.circle import CircleOfFifths, QuestionType, ChordType
-from core.chord import Chord
+from core.circle import ChordType
 from ui.render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
 from localization import Localization
-
+from core.game_text import generate_question_text, get_feedback_message
 from core.game_core import GameCore
 
 class GameState(Enum):
@@ -158,7 +157,8 @@ class CircleOfFifthsGame:
         """
         Renders the current quiz question at the top of the screen.
         """
-        question_surface = self.font_small.render(self.generate_question_text(state, self.loc), True, Config.COLORS["text"])
+        chord_list = self.core.get_chord_list(state["chord_type"])
+        question_surface = self.font_small.render(generate_question_text(state, self.loc, chord_list), True, Config.COLORS["text"])
         question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
@@ -175,7 +175,7 @@ class CircleOfFifthsGame:
         Renders the result/feedback message after an answer is submitted.
         """
         if state.get("last_result") is not None:
-            text = self.get_feedback_message(state, self.loc)
+            text = get_feedback_message(state, self.loc)
             result_surface = self.font_small.render(text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
@@ -188,78 +188,6 @@ class CircleOfFifthsGame:
             f"{self.correct_answers} / {self.total_questions}", True, Config.COLORS["text"]
         )
         self.screen.blit(answers_surface, (700, 20))
-
-    def generate_question_text(self, state, loc) -> str:
-        """
-        Generates the localized question text for the current quiz question.
-
-        Returns:
-            str: The localized question string.
-        """
-        chord_list = self.core.get_chord_list(state["chord_type"])
-        selected_index = chord_list.index(state["current_chord"])
-        chord_type_str = self.loc.t("major") if state["chord_type"] == ChordType.MAJOR else self.loc.t("minor")
-        hour = (selected_index + 11) % 12 + 1
-        chord_str = str(state["current_chord"])
-
-        question_keys = {
-            QuestionType.FILL_IN: "question_fill_in",
-            QuestionType.CLOCKWISE: "question_clockwise",
-            QuestionType.COUNTERCLOCKWISE: "question_counterclockwise",
-            QuestionType.ALTERNATIVE_CIRCLE: "question_alternative_circle",
-            QuestionType.ANY: "question_any",
-        }
-        key = question_keys.get(state["current_question"], "question_fill_in")
-        return loc.t(
-            key,
-            chord_type=chord_type_str,
-            hour=hour,
-            chord=chord_str
-        )
-
-    def get_feedback_message(self, state, loc) -> str:
-        """
-        Generates the localized feedback message for the user's answer.
-
-        Args:
-            is_correct (bool): Whether the answer was correct.
-            chord_answer (Chord): The user's answer.
-            selected_chord (Chord): The correct chord.
-            question_type (QuestionType): The type of question.
-
-        Returns:
-            str: The localized feedback message.
-        """
-        if state.get("last_result") is None:
-            return ""
-
-        if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
-            return loc.t(state["last_result"]["reason"])
-
-        is_correct = state.get("last_result").get("correct")
-        chord_str = str(state.get("current_chord"))
-        answer_str = state.get("last_result").get("answer")
-        correct_str = state.get("current_chord").name
-
-        feedback_keys = {
-            (True, QuestionType.FILL_IN): "feedback_correct_fill_in",
-            (True, QuestionType.ALTERNATIVE_CIRCLE): "feedback_correct_alternative_circle",
-            (True, QuestionType.ANY): "feedback_correct_any",
-            (True, QuestionType.CLOCKWISE): "feedback_correct_clockwise",
-            (True, QuestionType.COUNTERCLOCKWISE): "feedback_correct_counterclockwise",
-            (False, QuestionType.FILL_IN): "feedback_incorrect_fill_in",
-            (False, QuestionType.ALTERNATIVE_CIRCLE): "feedback_incorrect_alternative_circle",
-            (False, QuestionType.ANY): "feedback_incorrect_any",
-            (False, QuestionType.CLOCKWISE): "feedback_incorrect_clockwise",
-            (False, QuestionType.COUNTERCLOCKWISE): "feedback_incorrect_counterclockwise",
-        }
-        key = feedback_keys.get((is_correct, state["current_question"]), "feedback_correct_fill_in" if is_correct else "feedback_incorrect_fill_in")
-        return loc.t(
-            key,
-            answer=answer_str,
-            selected=chord_str,
-            correct=correct_str
-        )
 
     def run(self) -> None:
         """
