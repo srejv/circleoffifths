@@ -16,12 +16,6 @@ class ChordType(Enum):
     MAJOR = 1
     MINOR = 2
 
-question_types: List[QuestionType] = [
-    QuestionType.CLOCKWISE, QuestionType.COUNTERCLOCKWISE,
-    QuestionType.ALTERNATIVE_CIRCLE, QuestionType.ANY
-]
-chord_types: List[ChordType] = [ChordType.MAJOR, ChordType.MINOR]
-
 CIRCLE_SIZE: int = 12  # Number of chords in the circle
 
 class CircleOfFifths:
