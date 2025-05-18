@@ -41,7 +41,7 @@ class CircleOfFifthsGame:
         self.blink_manager = BlinkManager()
 
         if renderer is None:
-            renderer = GameRenderer()
+            renderer = GameRenderer(lang)
         self.renderer: IGameRenderer = renderer
 
     def handle_events(self) -> None:
