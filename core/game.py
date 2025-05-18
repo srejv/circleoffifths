@@ -1,6 +1,5 @@
 import pygame
-import random
-from typing import Set, Tuple, Optional
+from typing import Set
 from core.circle import CircleOfFifths, QuestionType, ChordType
 from core.chord import Chord
 from ui.render import CircleOfFifthsDrawable
