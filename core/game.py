@@ -140,7 +140,7 @@ class CircleOfFifthsGame:
         self.overlay.fill((0, 0, 0, 0))
 
         self.circle_render.draw_circle(self.screen, self.selected_chord_indices)
-        if state["current_chord"] is not None:
+        if state.get("current_chord") is not None:
             self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink)
         if self.state != GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
