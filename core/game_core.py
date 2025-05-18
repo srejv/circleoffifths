@@ -64,8 +64,8 @@ class GameCore:
     
     @property
     def major_chords(self):
-        return self.circle.majorChords
+        return self.circle.major_chords
 
     @property
     def minor_chords(self):
-        return self.circle.minorChords
+        return self.circle.minor_chords

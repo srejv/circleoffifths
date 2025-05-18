@@ -45,30 +45,38 @@ class CircleOfFifthsDrawable:
     Handles rendering of the Circle of Fifths, including chords, highlights, and labels.
     """
 
-    def __init__(self, majorChords: List = None, minorChords: List = None, font: pygame.font.Font = None) -> None:
+    def __init__(
+        self,
+        major_chords,
+        minor_chords,
+        center=(400, 360),
+        radius=200,
+        inner_radius=125,
+        text_radius=160,
+        inner_outer_radius=40,
+        font=None
+    ):
         """
         Initializes the drawable circle with chord lists and font.
 
         Args:
-            majorChords (List): List of major chords.
-            minorChords (List): List of minor chords.
+            major_chords (List): List of major chords.
+            minor_chords (List): List of minor chords.
             font (pygame.font.Font): Font to use for labels.
         """
-        self.majorChords = majorChords or []
-        self.minorChords = minorChords or []
+        self.major_chords = major_chords or []
+        self.minor_chords = minor_chords or []
 
         self.WIDTH = 600
         self.HEIGHT = 600
 
+        self.CENTER: Tuple[int, int] = center
+        self.RADIUS: int = radius
+        self.INNER_RADIUS: int = inner_radius
+        self.TEXT_RADIUS: int = text_radius
+        self.INNER_OUTER_RADIUS: int = inner_outer_radius
+        self.SEGMENTS: int = len(self.major_chords)
         self.FONT = font or pygame.font.SysFont(None, 30)
-
-        # Constants
-        self.CENTER: Tuple[int, int] = (self.WIDTH // 2, self.HEIGHT // 2)
-        self.RADIUS: int = 200
-        self.INNER_RADIUS: int = 125
-        self.TEXT_RADIUS: int = 160
-        self.INNER_OUTER_RADIUS: int = 40
-        self.SEGMENTS: int = len(self.majorChords)
 
         self.COLOR_BLACK: Tuple[int, int, int] = (30, 30, 30)
         self.COLOR_WHITE: Tuple[int, int, int] = (220, 220, 220)
@@ -177,7 +185,7 @@ class CircleOfFifthsDrawable:
         pygame.draw.circle(surface, self.COLOR_BLACK, self.CENTER, self.INNER_RADIUS+1, 3)
         pygame.draw.circle(surface, self.COLOR_BLACK, self.CENTER, self.INNER_OUTER_RADIUS)
         
-        self._draw_lines(surface, self.majorChords)
+        self._draw_lines(surface, self.major_chords)
 
     def draw_circle_labels(self, surface: pygame.Surface) -> None:
         """
@@ -186,8 +194,8 @@ class CircleOfFifthsDrawable:
         Args:
             surface (pygame.Surface): The surface to draw on.
         """
-        self._draw_text(surface, self.majorChords, self.TEXT_RADIUS)
-        self._draw_text(surface, self.minorChords, self.INNER_RADIUS - 30)
+        self._draw_text(surface, self.major_chords, self.TEXT_RADIUS)
+        self._draw_text(surface, self.minor_chords, self.INNER_RADIUS - 30)
     
     def draw_highlighted_chord(
         self, surface: pygame.Surface, chord, chord_type: ChordType, blink: bool
@@ -202,41 +210,6 @@ class CircleOfFifthsDrawable:
             blink (bool): Whether to blink the highlight.
         """
         color = (255, 255, 255, 220) if not blink else (0, 0, 0, 0)
-        index = self.majorChords.index(chord) if chord_type == ChordType.MAJOR else self.minorChords.index(chord)
+        index = self.major_chords.index(chord) if chord_type == ChordType.MAJOR else self.minor_chords.index(chord)
         polygon_list = self.segments_polygons if chord_type == ChordType.MAJOR else self.inner_segments_polygons
         pygame.draw.polygon(surface, color, polygon_list[index])
-
-    def is_inside_circle(self, point: Tuple[int, int]) -> bool:
-        """
-        Checks if a point is inside the circle of fifths.
-
-        Args:
-            point (Tuple[int, int]): The (x, y) coordinates of the point.
-
-        Returns:
-            bool: True if the point is inside the circle, False otherwise.
-        """
-        x, y = point
-        return (x - self.CENTER[0])**2 + (y - self.CENTER[1])**2 <= self.RADIUS**2
-    
-    def get_chord_index(self, point: Tuple[int, int]) -> int:
-        """
-        Returns the index of the chord at the given point in the circle.
-
-        Args:
-            point (Tuple[int, int]): The (x, y) coordinates of the point.
-
-        Returns:
-            int: The index of the chord, or None if not found.
-        """
-        x, y = point
-        segment_size = 360 / self.SEGMENTS
-        angle = math.degrees(math.atan2(y - self.CENTER[1], x - self.CENTER[0])) % 360
-        angle = angle + 90 + segment_size/2
-        if angle < 0:
-            angle += 360
-        if angle > 360:
-            angle -= 360
-
-        index = int(angle // segment_size)
-        return index

@@ -1,17 +1,7 @@
 from core.chord import Chord
 from enum import Enum
-from typing import List, Optional, Union
-
-# Define the major and minor chords for the circle of fifths.
-majorChords: List[Chord] = [
-    Chord("C"), Chord("G"), Chord("D"), Chord("A"), Chord("E"), Chord("B"),
-    Chord("F#/Gb"), Chord("C#/Db"), Chord("G#/Ab"), Chord("D#/Eb"), Chord("A#/Bb"), Chord("F")
-]
-minorChords: List[Chord] = [
-    Chord("Am"), Chord("Em"), Chord("Bm"), Chord("F#m/Gbm"), Chord("C#m/Dbm"),
-    Chord("G#m/Abm"), Chord("D#m/Ebm"), Chord("A#m/Bbm"), Chord("Fm"), Chord("Cm"),
-    Chord("Gm"), Chord("Dm")
-]
+from typing import List, Optional
+from core.chord_lists import major_chords, minor_chords
 
 class QuestionType(Enum):
     """Enumeration for the different types of quiz questions."""
@@ -44,8 +34,8 @@ class CircleOfFifths:
         """
         Initializes the Circle of Fifths with major and minor chords.
         """
-        self.majorChords: List[Chord] = majorChords
-        self.minorChords: List[Chord] = minorChords
+        self.major_chords: List[Chord] = major_chords
+        self.minor_chords: List[Chord] = minor_chords
 
     def get_chord_list(self, chord_type: ChordType) -> List[Chord]:
         """
@@ -58,9 +48,9 @@ class CircleOfFifths:
             List[Chord]: The list of Chord objects for the specified type.
         """
         if chord_type == ChordType.MAJOR:
-            return self.majorChords
+            return self.major_chords
         elif chord_type == ChordType.MINOR:
-            return self.minorChords
+            return self.minor_chords
         else:
             raise ValueError("Invalid chord type")
 
@@ -74,7 +64,7 @@ class CircleOfFifths:
         Returns:
             Optional[Chord]: The matching Chord object, or None if not found.
         """
-        for chord in self.minorChords + self.majorChords:
+        for chord in self.minor_chords + self.major_chords:
             if chord.contains(name):
                 return chord
         return None

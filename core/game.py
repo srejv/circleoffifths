@@ -8,6 +8,7 @@ from core.blink_manager import BlinkManager
 from ui.game_renderer import GameRenderer
 from core.types import GameStateDict
 from ui.interfaces import IGameRenderer
+from core.collision import is_inside_circle, get_chord_index
 
 class GameState(Enum):
     """Enumeration for the different game states."""
@@ -35,9 +36,6 @@ class CircleOfFifthsGame:
         pygame.display.set_caption("Circle of Fifths Quiz")
         self.clock: pygame.time.Clock = pygame.time.Clock()
 
-        self.circle_render = CircleOfFifthsDrawable(self.core.major_chords, self.core.minor_chords)
-        self.circle_render.set_center((400, 360))
-
         self.input_text: str = ""
         self.state: GameState = GameState.ACTIVE
         self.redraw: bool = True
@@ -51,8 +49,7 @@ class CircleOfFifthsGame:
             loc: Localization = Localization(lang)
 
             renderer = GameRenderer(
-                screen, overlay, font_small, font_large,
-                self.circle_render, loc
+                screen, overlay, font_small, font_large, loc
             )
         self.renderer: IGameRenderer = renderer
 
@@ -81,8 +78,8 @@ class CircleOfFifthsGame:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
-                    if self.circle_render.is_inside_circle(mouse_pos):
-                        selected_chord_index = self.circle_render.get_chord_index(mouse_pos)
+                    if is_inside_circle(Config.CIRCLE_CENTER, Config.CIRCLE_RADIUS, mouse_pos):
+                        selected_chord_index = get_chord_index(Config.CIRCLE_CENTER, mouse_pos)
                         if selected_chord_index is not None:
                             indices = self.core.get_selected_chord_indices()
                             if selected_chord_index in indices:

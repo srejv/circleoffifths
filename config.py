@@ -8,3 +8,8 @@ class Config:
         "background": (30, 30, 30),
         "text": (255, 255, 255),
     }
+    CIRCLE_CENTER = (400, 360)
+    CIRCLE_RADIUS = 200
+    CIRCLE_INNER_RADIUS = 125
+    CIRCLE_TEXT_RADIUS = 160
+    CIRCLE_INNER_OUTER_RADIUS = 40

@@ -1,8 +1,9 @@
 import pygame
-from core.circle import ChordType
 from core.game_text import generate_question_text, get_feedback_message
 from config import Config
 from core.types import GameStateDict
+from core.chord_lists import major_chords, minor_chords
+from ui.render import CircleOfFifthsDrawable
 from ui.interfaces import IGameRenderer
 
 class GameRenderer(IGameRenderer):
@@ -11,13 +12,20 @@ class GameRenderer(IGameRenderer):
     """
 
     def __init__(self, screen: pygame.Surface, overlay: pygame.Surface, font_small: pygame.font.Font,
-                 font_large: pygame.font.Font, circle_render, loc):
+                 font_large: pygame.font.Font, loc):
         self.screen = screen
         self.overlay = overlay
         self.font_small = font_small
         self.font_large = font_large
-        self.circle_render = circle_render
         self.loc = loc
+        self.circle_render = CircleOfFifthsDrawable(
+            major_chords, minor_chords,
+            center=Config.CIRCLE_CENTER,
+            radius=Config.CIRCLE_RADIUS,
+            inner_radius=Config.CIRCLE_INNER_RADIUS,
+            text_radius=Config.CIRCLE_TEXT_RADIUS,
+            inner_outer_radius=Config.CIRCLE_INNER_OUTER_RADIUS,
+        )
 
     def render(self, state: GameStateDict, input_text: str, blink: bool) -> None:
         """
