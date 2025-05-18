@@ -179,13 +179,7 @@ class CircleOfFifthsGame:
             if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
                 text = self.loc.t(state["last_result"]["reason"])
             elif state.get("last_result").get("reason") is None:
-                text = self.get_feedback_message(
-                    state,
-                    state["last_result"]["correct"],
-                    state["last_result"]["answer"],
-                    state["current_chord"],
-                    state["current_question"]
-                )
+                text = self.get_feedback_message(state)
             result_surface = self.font_small.render(text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
@@ -227,14 +221,7 @@ class CircleOfFifthsGame:
             chord=chord_str
         )
 
-    def get_feedback_message(
-        self,
-        state,
-        is_correct: bool,
-        chord_answer: Chord,
-        selected_chord: Chord,
-        question_type: QuestionType
-    ) -> str:
+    def get_feedback_message(self, state) -> str:
         """
         Generates the localized feedback message for the user's answer.
 
@@ -247,9 +234,13 @@ class CircleOfFifthsGame:
         Returns:
             str: The localized feedback message.
         """
-        chord_str = str(state["current_chord"])
-        answer_str = str(chord_answer)
-        correct_str = selected_chord.name
+        if state.get("last_result") is None:
+            return ""
+
+        is_correct = state.get("last_result").get("correct")
+        chord_str = str(state.get("current_chord"))
+        answer_str = state.get("last_result").get("answer")
+        correct_str = state.get("current_chord").name
 
         feedback_keys = {
             (True, QuestionType.FILL_IN): "feedback_correct_fill_in",
