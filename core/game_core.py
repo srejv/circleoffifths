@@ -20,6 +20,9 @@ class GameCore:
     def set_selected_chord_indices(self, indices: List[int]) -> None:
         self.selected_chord_indices = set(indices)
 
+    def get_selected_chord_indices(self):
+        return self.selected_chord_indices
+
     def next_question(self) -> None:
         self.chord_type = random.choice(list(ChordType))
         chord_list = self.circle.get_chord_list(self.chord_type)

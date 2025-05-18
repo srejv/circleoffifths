@@ -45,7 +45,6 @@ class CircleOfFifthsGame:
         self.circle_render = CircleOfFifthsDrawable(self.core.major_chords, self.core.minor_chords)
         self.circle_render.set_center((400, 360))
 
-        self.selected_chord_indices: Set[int] = set(range(len(self.core.get_chord_list(ChordType.MAJOR))))
         self.correct_answers: int = 0
         self.total_questions: int = 0
         self.input_text: str = ""
@@ -81,11 +80,12 @@ class CircleOfFifthsGame:
                     if self.circle_render.is_inside_circle(mouse_pos):
                         selected_chord_index = self.circle_render.get_chord_index(mouse_pos)
                         if selected_chord_index is not None:
-                            if selected_chord_index in self.selected_chord_indices:
-                                self.selected_chord_indices.remove(selected_chord_index)
+                            indices = self.core.get_selected_chord_indices()
+                            if selected_chord_index in indices:
+                                indices.remove(selected_chord_index)
                             else:
-                                self.selected_chord_indices.add(selected_chord_index)
-                            self.core.set_selected_chord_indices(list(self.selected_chord_indices))
+                                indices.add(selected_chord_index)
+                            self.core.set_selected_chord_indices(indices)
                             self.redraw = True
 
     def handle_input(self, event: pygame.event.Event) -> None:
@@ -128,7 +128,7 @@ class CircleOfFifthsGame:
         self.screen.fill(Config.COLORS["background"])
         self.overlay.fill((0, 0, 0, 0))
 
-        self.circle_render.draw_circle(self.screen, self.selected_chord_indices)
+        self.circle_render.draw_circle(self.screen, self.core.get_selected_chord_indices())
         if state.get("current_chord") is not None:
             self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink_manager.is_blinking())
         if self.state != GameState.ACTIVE:
