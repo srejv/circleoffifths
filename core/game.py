@@ -49,7 +49,6 @@ class CircleOfFifthsGame:
         self.correct_answers: int = 0
         self.total_questions: int = 0
         self.input_text: str = ""
-        self.result_text: str = ""
         self.state: GameState = GameState.ACTIVE
         self.blink: bool = False
         self.blink_counter: int = 0
@@ -113,7 +112,6 @@ class CircleOfFifthsGame:
         Resets the state for the next quiz question.
         """
         self.input_text = ""
-        self.result_text = ""
         self.core.next_question()
         self.state = GameState.ACTIVE
         self.blink = False
