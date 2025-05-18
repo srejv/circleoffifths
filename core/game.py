@@ -1,8 +1,6 @@
 import pygame
-from ui.render import CircleOfFifthsDrawable
 from enum import Enum
 from config import Config
-from localization import Localization
 from core.game_core import GameCore
 from core.blink_manager import BlinkManager
 from ui.game_renderer import GameRenderer
