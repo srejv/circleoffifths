@@ -85,7 +85,7 @@ class CircleOfFifthsGame:
                                 self.selected_chord_indices.remove(selected_chord_index)
                             else:
                                 self.selected_chord_indices.add(selected_chord_index)
-                            self.core.set_selected_indices(list(self.selected_chord_indices))
+                            self.core.set_selected_chord_indices(list(self.selected_chord_indices))
                             self.redraw = True
 
     def handle_input(self, event: pygame.event.Event) -> None:

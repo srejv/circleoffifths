@@ -12,18 +12,18 @@ class GameCore:
     def __init__(self):
         self.circle = CircleOfFifths()
         self.chord_type = ChordType.MAJOR
-        self.selected_indices = set(range(12))
+        self.selected_chord_indices = set(range(12))
         self.current_question = None
         self.current_chord = None
         self.last_result = None
 
-    def set_selected_indices(self, indices: List[int]) -> None:
-        self.selected_indices = set(indices)
+    def set_selected_chord_indices(self, indices: List[int]) -> None:
+        self.selected_chord_indices = set(indices)
 
     def next_question(self) -> None:
         self.chord_type = random.choice(list(ChordType))
         chord_list = self.circle.get_chord_list(self.chord_type)
-        available = [chord_list[i] for i in self.selected_indices]
+        available = [chord_list[i] for i in self.selected_chord_indices]
         self.current_chord = random.choice(available)
         self.current_question = QuestionType.FILL_IN # random.choice(list(QuestionType))
         self.last_result = None
@@ -44,7 +44,7 @@ class GameCore:
             "chord_type": self.chord_type,
             "current_chord": self.current_chord,
             "current_question": self.current_question,
-            "selected_indices": list(self.selected_indices),
+            "selected_chord_indices": list(self.selected_chord_indices),
             "last_result": self.last_result,
         }
 
