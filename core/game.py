@@ -6,6 +6,7 @@ from localization import Localization
 from core.game_core import GameCore
 from core.blink_manager import BlinkManager
 from ui.game_renderer import GameRenderer
+from core.types import GameStateDict
 
 class GameState(Enum):
     """Enumeration for the different game states."""
@@ -120,7 +121,7 @@ class CircleOfFifthsGame:
         if not self.redraw:
             return
         
-        state = self.core.get_state()
+        state: GameStateDict = self.core.get_state()
         # Add any extra info needed by the renderer:
         state["game_state"] = self.state.name
         state["chord_list"] = self.core.get_chord_list(state["chord_type"])

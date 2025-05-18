@@ -2,6 +2,7 @@ import pygame
 from core.circle import ChordType
 from core.game_text import generate_question_text, get_feedback_message
 from config import Config
+from core.types import GameStateDict
 
 class GameRenderer:
     """
@@ -17,7 +18,7 @@ class GameRenderer:
         self.circle_render = circle_render
         self.loc = loc
 
-    def render(self, state, input_text: str, blink: bool):
+    def render(self, state: GameStateDict, input_text: str, blink: bool):
         """
         Renders the entire game screen.
         """
