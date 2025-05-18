@@ -175,11 +175,7 @@ class CircleOfFifthsGame:
         Renders the result/feedback message after an answer is submitted.
         """
         if state.get("last_result") is not None:
-            text = ""
-            if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
-                text = self.loc.t(state["last_result"]["reason"])
-            elif state.get("last_result").get("reason") is None:
-                text = self.get_feedback_message(state)
+            text = self.get_feedback_message(state)
             result_surface = self.font_small.render(text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
@@ -236,6 +232,9 @@ class CircleOfFifthsGame:
         """
         if state.get("last_result") is None:
             return ""
+
+        if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
+            return self.loc.t(state["last_result"]["reason"])
 
         is_correct = state.get("last_result").get("correct")
         chord_str = str(state.get("current_chord"))
