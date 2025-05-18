@@ -62,6 +62,7 @@ class GameCore:
         Returns:
             bool: True if the answer is correct, False otherwise.
         """
+        self.total_questions += 1
         chord = self.circle.find_chord(answer)
         if chord is None:
             self.last_result = {"correct": False, "reason": "not_found"}
@@ -70,7 +71,6 @@ class GameCore:
             chord, self.current_chord, self.current_question, self.chord_type
         )
         self.last_result = {"correct": correct, "answer": chord}
-        self.total_questions += 1
         if correct:
             self.correct_answers += 1
         return correct
