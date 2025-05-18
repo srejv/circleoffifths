@@ -8,6 +8,7 @@ from localization import Localization
 from core.game_text import generate_question_text, get_feedback_message
 from core.game_core import GameCore
 from core.blink_manager import BlinkManager
+from ui.game_renderer import GameRenderer
 
 class GameState(Enum):
     """Enumeration for the different game states."""
@@ -49,6 +50,11 @@ class CircleOfFifthsGame:
         self.state: GameState = GameState.ACTIVE
         self.redraw: bool = True
         self.blink_manager = BlinkManager()
+
+        self.renderer = GameRenderer(
+            self.screen, self.overlay, self.font_small, self.font_large,
+            self.circle_render, self.loc
+        )
 
     def handle_events(self) -> None:
         """
@@ -118,58 +124,13 @@ class CircleOfFifthsGame:
             return
         
         state = self.core.get_state()
+        # Add any extra info needed by the renderer:
+        state["game_state"] = self.state.name
+        state["chord_list"] = self.core.get_chord_list(state["chord_type"])
+        state["stats"] = self.core.get_stats()
 
         self.redraw = False
-        self.screen.fill(Config.COLORS["background"])
-        self.overlay.fill((0, 0, 0, 0))
-
-        self.circle_render.draw_circle(self.screen, self.core.get_selected_chord_indices())
-        if state.get("current_chord") is not None:
-            self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink_manager.is_blinking())
-        if self.state != GameState.ACTIVE:
-            self.circle_render.draw_circle_labels(self.overlay)
-
-        self.screen.blit(self.overlay, (0, 0))
-        self.render_question(state)
-        self.render_input()
-        self.render_results(state)
-        self.render_stats()
-
-        pygame.display.flip()
-
-    def render_question(self, state) -> None:
-        """
-        Renders the current quiz question at the top of the screen.
-        """
-        chord_list = self.core.get_chord_list(state["chord_type"])
-        question_surface = self.font_small.render(generate_question_text(state, self.loc, chord_list), True, Config.COLORS["text"])
-        question_text_rect = question_surface.get_rect(center=(400, 20))
-        self.screen.blit(question_surface, question_text_rect)
-
-    def render_input(self) -> None:
-        """
-        Renders the user's current input.
-        """
-        input_surface = self.font_large.render(self.input_text, True, Config.COLORS["text"])
-        input_text_rect = input_surface.get_rect(center=(400, 80))
-        self.screen.blit(input_surface, input_text_rect)
-
-    def render_results(self, state) -> None:
-        """
-        Renders the result/feedback message after an answer is submitted.
-        """
-        if state.get("last_result") is not None:
-            text = get_feedback_message(state, self.loc)
-            result_surface = self.font_small.render(text, True, Config.COLORS["text"])
-            result_text_rect = result_surface.get_rect(center=(400, 110))
-            self.screen.blit(result_surface, result_text_rect)
-
-    def render_stats(self) -> None:
-        correct, total = self.core.get_stats()
-        answers_surface = self.font_small.render(
-            f"{correct} / {total}", True, Config.COLORS["text"]
-        )
-        self.screen.blit(answers_surface, (700, 20))
+        self.renderer.render(state, self.input_text, self.blink_manager.is_blinking())
 
     def run(self) -> None:
         """
