@@ -7,6 +7,7 @@ from config import Config
 from localization import Localization
 from core.game_text import generate_question_text, get_feedback_message
 from core.game_core import GameCore
+from core.blink_manager import BlinkManager
 
 class GameState(Enum):
     """Enumeration for the different game states."""
@@ -49,9 +50,8 @@ class CircleOfFifthsGame:
         self.total_questions: int = 0
         self.input_text: str = ""
         self.state: GameState = GameState.ACTIVE
-        self.blink: bool = False
-        self.blink_counter: int = 0
         self.redraw: bool = True
+        self.blink_manager = BlinkManager()
 
     def handle_events(self) -> None:
         """
@@ -113,18 +113,7 @@ class CircleOfFifthsGame:
         self.input_text = ""
         self.core.next_question()
         self.state = GameState.ACTIVE
-        self.blink = False
-        self.blink_counter = 0
-
-    def update_blink(self) -> None:
-        """
-        Updates the blink state for UI effects.
-        """
-        self.blink_counter += 1
-        if self.blink_counter > 30:
-            self.blink = not self.blink
-            self.blink_counter = 0
-            self.redraw = True
+        self.blink_manager.reset()
 
     def render(self) -> None:
         """
@@ -141,7 +130,7 @@ class CircleOfFifthsGame:
 
         self.circle_render.draw_circle(self.screen, self.selected_chord_indices)
         if state.get("current_chord") is not None:
-            self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink)
+            self.circle_render.draw_highlighted_chord(self.overlay, state["current_chord"], state["chord_type"], self.blink_manager.is_blinking())
         if self.state != GameState.ACTIVE:
             self.circle_render.draw_circle_labels(self.overlay)
 
@@ -195,6 +184,7 @@ class CircleOfFifthsGame:
         """
         while True:
             self.handle_events()
-            self.update_blink()
+            if self.blink_manager.update():
+                self.redraw = True
             self.render()
             self.clock.tick(Config.FPS)
