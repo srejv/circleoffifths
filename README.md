@@ -10,6 +10,7 @@ This is a practice app for learning and mastering the circle of fifths. The goal
 - **Configurable Range:** Choose how many chords to include in your practice range.
 - **Keyboard Controls:** Use keyboard shortcuts to answer questions and adjust settings.
 - **Feedback:** Immediate feedback on your answers, with localized messages.
+- **Interactive Circle:** Click on a slice of the circle of fifths to add or remove that chord from the quiz selection.
 
 ## Installation
 
@@ -19,10 +20,13 @@ This is a practice app for learning and mastering the circle of fifths. The goal
     cd circleoffifths
     ```
 
-2. **Set up a virtual environment (optional but recommended):**
+2. **Set up a virtual environment (recommended):**
     ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    # On Windows:
+    venv\Scripts\activate
+    # On macOS/Linux:
+    source venv/bin/activate
     ```
 
 3. **Install dependencies:**
@@ -35,16 +39,41 @@ This is a practice app for learning and mastering the circle of fifths. The goal
     python main.py
     ```
 
+## Dependency Management
+
+All dependencies are listed in `requirements.txt`.  
+To add a new dependency, install it with pip and update the file:
+
+```bash
+pip install <package>
+pip freeze > requirements.txt
+```
+
+To install all dependencies for this project, use:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Usage
 
 - **Answer questions** by typing the chord name and pressing Enter.
 - **Switch language** by changing the `lang` parameter in `main.py` or `game.py` (e.g., `"en"` for English, `"sv"` for Swedish).
-- **Increase/decrease range** with the `+` and `-` keys.
+- **Click on a slice** of the circle to add or remove that chord from the quiz.
 - **Quit** with the `Esc` key.
 
 ## Localization
 
 All user-facing text is localized. To add a new language, create a new JSON file in the `locales/` directory (e.g., `fr.json` for French) and translate the keys.
+
+## Testing
+
+Unit tests are located in the `tests/` directory.  
+To run all tests:
+
+```bash
+python -m unittest discover -s tests
+```
 
 ## Resources
 
