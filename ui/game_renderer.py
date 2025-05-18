@@ -31,7 +31,12 @@ class GameRenderer(IGameRenderer):
 
     def render(self, state: GameStateDict, input_text: str, blink: bool) -> None:
         """
-        Renders the entire game screen.
+        Renders the entire game screen, including the circle, overlays, question, input, results, and stats.
+
+        Args:
+            state (GameStateDict): The current game state dictionary.
+            input_text (str): The current user input text.
+            blink (bool): Whether the blink effect is active.
         """
         self.screen.fill(Config.COLORS["background"])
         self.overlay.fill((0, 0, 0, 0))
@@ -52,6 +57,12 @@ class GameRenderer(IGameRenderer):
         pygame.display.flip()
 
     def render_question(self, state) -> None:
+        """
+        Renders the current quiz question at the top of the screen.
+
+        Args:
+            state (GameStateDict): The current game state dictionary.
+        """
         chord_list = state["chord_list"]
         question_surface = self.font_small.render(
             generate_question_text(state, self.loc, chord_list), True, Config.COLORS["text"]
@@ -60,11 +71,23 @@ class GameRenderer(IGameRenderer):
         self.screen.blit(question_surface, question_text_rect)
 
     def render_input(self, input_text: str) -> None:
+        """
+        Renders the user's current input.
+
+        Args:
+            input_text (str): The current user input text.
+        """
         input_surface = self.font_large.render(input_text, True, Config.COLORS["text"])
         input_text_rect = input_surface.get_rect(center=(400, 80))
         self.screen.blit(input_surface, input_text_rect)
 
     def render_results(self, state) -> None:
+        """
+        Renders the result/feedback message after an answer is submitted.
+
+        Args:
+            state (GameStateDict): The current game state dictionary.
+        """
         if state.get("last_result") is not None:
             text = get_feedback_message(state, self.loc)
             result_surface = self.font_small.render(text, True, Config.COLORS["text"])
@@ -72,6 +95,12 @@ class GameRenderer(IGameRenderer):
             self.screen.blit(result_surface, result_text_rect)
 
     def render_stats(self, state) -> None:
+        """
+        Renders the user's score and statistics.
+
+        Args:
+            state (GameStateDict): The current game state dictionary.
+        """
         correct, total = state.get("stats", (0, 0))
         answers_surface = self.font_small.render(
             f"{correct} / {total}", True, Config.COLORS["text"]

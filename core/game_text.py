@@ -5,11 +5,12 @@ from typing import List
 
 def generate_question_text(state: dict, loc: Localization, chord_list: List[Chord]) -> str:
     """
-    Generates the localized question text for the current quiz question.
+    Generate the localized question text for the current quiz question.
 
     Args:
-        state (dict): The current game state.
-        loc (Localization): The localization instance.
+        state (dict): The current game state dictionary.
+        loc (Localization): The localization instance to use for translations.
+        chord_list (List[Chord]): The list of chords for the current circle.
 
     Returns:
         str: The localized question string.
@@ -36,11 +37,11 @@ def generate_question_text(state: dict, loc: Localization, chord_list: List[Chor
 
 def get_feedback_message(state: dict, loc: Localization) -> str:
     """
-    Generates the localized feedback message for the user's answer.
+    Generate the localized feedback message for the user's answer.
 
     Args:
-        state (dict): The current game state.
-        loc (Localization): The localization instance.
+        state (dict): The current game state dictionary.
+        loc (Localization): The localization instance to use for translations.
 
     Returns:
         str: The localized feedback message.

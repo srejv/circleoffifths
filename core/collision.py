@@ -3,7 +3,7 @@ import math
 
 def is_inside_circle(center: Tuple[int, int], radius: int, point: Tuple[int, int]) -> bool:
     """
-    Checks if a point is inside a given circle.
+    Determine if a point is inside a given circle.
 
     Args:
         center (Tuple[int, int]): The (x, y) coordinates of the circle's center.
@@ -18,20 +18,20 @@ def is_inside_circle(center: Tuple[int, int], radius: int, point: Tuple[int, int
 
 def get_chord_index(center: Tuple[int, int], point: Tuple[int, int]) -> int:
     """
-    Returns the index of the chord segment at the given point in the circle.
+    Calculate the index of the chord segment at the given point in the circle.
 
     Args:
         center (Tuple[int, int]): The (x, y) coordinates of the circle's center.
         point (Tuple[int, int]): The (x, y) coordinates of the point to check.
 
     Returns:
-        int: The index of the chord segment (0-11), or None if not found.
+        int: The index of the chord segment (0-11).
     """
     SEGMENTS = 12
     x, y = point
     segment_size = 360 / SEGMENTS
     angle = math.degrees(math.atan2(y - center[1], x - center[0])) % 360
-    angle = angle + 90 + segment_size/2
+    angle = angle + 90 + segment_size / 2
     if angle < 0:
         angle += 360
     if angle > 360:

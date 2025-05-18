@@ -10,6 +10,15 @@ class Localization:
     _instance: Optional["Localization"] = None
 
     def __new__(cls, lang: str = "en") -> "Localization":
+        """
+        Creates or returns the singleton instance for the specified language.
+
+        Args:
+            lang (str): Language code (e.g., "en", "sv").
+
+        Returns:
+            Localization: The singleton instance.
+        """
         if cls._instance is None or cls._instance.lang != lang:
             cls._instance = super(Localization, cls).__new__(cls)
             cls._instance._initialized = False

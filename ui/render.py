@@ -62,7 +62,12 @@ class CircleOfFifthsDrawable:
         Args:
             major_chords (List): List of major chords.
             minor_chords (List): List of minor chords.
-            font (pygame.font.Font): Font to use for labels.
+            center (Tuple[int, int], optional): Center of the circle. Defaults to (400, 360).
+            radius (int, optional): Outer radius of the circle. Defaults to 200.
+            inner_radius (int, optional): Inner radius for minor chords. Defaults to 125.
+            text_radius (int, optional): Radius for text labels. Defaults to 160.
+            inner_outer_radius (int, optional): Inner radius for the inner circle. Defaults to 40.
+            font (pygame.font.Font, optional): Font to use for labels. Defaults to None.
         """
         self.major_chords = major_chords or []
         self.minor_chords = minor_chords or []

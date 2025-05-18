@@ -32,7 +32,7 @@ class Chord:
             name (str): The name to check.
 
         Returns:
-            bool: True if the name matches, False otherwise.
+            bool: True if the name matches any alternative name, False otherwise.
         """
         return name in self.alternative_names
 

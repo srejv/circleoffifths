@@ -28,6 +28,7 @@ class CircleOfFifthsGame:
 
         Args:
             lang (str): Language code for localization (default "en").
+            renderer (IGameRenderer, optional): Renderer instance. If None, a default GameRenderer is used.
         """
 
         self.core = GameCore()
@@ -48,6 +49,7 @@ class CircleOfFifthsGame:
     def handle_events(self) -> None:
         """
         Handles all pygame events, including keyboard and mouse input.
+        Processes quit, keyboard, and mouse events, and updates game state accordingly.
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -99,6 +101,7 @@ class CircleOfFifthsGame:
     def reset_for_next_question(self) -> None:
         """
         Resets the state for the next quiz question.
+        Clears input, generates a new question, resets state and blink manager.
         """
         self.input_text = ""
         self.core.next_question()
@@ -108,6 +111,7 @@ class CircleOfFifthsGame:
     def render(self) -> None:
         """
         Renders the game screen and overlays.
+        Updates the renderer with the current game state, input, and blink status.
         """
         if not self.redraw:
             return
@@ -124,6 +128,7 @@ class CircleOfFifthsGame:
     def run(self) -> None:
         """
         Main game loop.
+        Handles events, updates blink state, renders the game, and maintains frame rate.
         """
         while True:
             self.handle_events()
