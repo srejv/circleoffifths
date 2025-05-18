@@ -3,8 +3,9 @@ from core.circle import ChordType
 from core.game_text import generate_question_text, get_feedback_message
 from config import Config
 from core.types import GameStateDict
+from ui.interfaces import IGameRenderer
 
-class GameRenderer:
+class GameRenderer(IGameRenderer):
     """
     Handles all rendering for the Circle of Fifths game.
     """
@@ -18,7 +19,7 @@ class GameRenderer:
         self.circle_render = circle_render
         self.loc = loc
 
-    def render(self, state: GameStateDict, input_text: str, blink: bool):
+    def render(self, state: GameStateDict, input_text: str, blink: bool) -> None:
         """
         Renders the entire game screen.
         """

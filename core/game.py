@@ -7,6 +7,7 @@ from core.game_core import GameCore
 from core.blink_manager import BlinkManager
 from ui.game_renderer import GameRenderer
 from core.types import GameStateDict
+from ui.interfaces import IGameRenderer
 
 class GameState(Enum):
     """Enumeration for the different game states."""
@@ -20,7 +21,7 @@ class CircleOfFifthsGame:
     Handles game state, event processing, rendering, and quiz logic.
     """
 
-    def __init__(self, lang: str = "en") -> None:
+    def __init__(self, lang: str = "en", renderer: IGameRenderer = None) -> None:
         """
         Initializes the game, pygame, and all game state.
 
@@ -42,17 +43,18 @@ class CircleOfFifthsGame:
         self.redraw: bool = True
         self.blink_manager = BlinkManager()
 
-        screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
-        overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
-        font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
-        font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+        if renderer is None:
+            screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+            overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
+            font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
+            font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+            loc: Localization = Localization(lang)
 
-        loc: Localization = Localization(lang)
-
-        self.renderer = GameRenderer(
-            screen, overlay, font_small, font_large,
-            self.circle_render, loc
-        )
+            renderer = GameRenderer(
+                screen, overlay, font_small, font_large,
+                self.circle_render, loc
+            )
+        self.renderer: IGameRenderer = renderer
 
     def handle_events(self) -> None:
         """
