@@ -5,19 +5,21 @@ from core.types import GameStateDict
 from core.chord_lists import major_chords, minor_chords
 from ui.render import CircleOfFifthsDrawable
 from ui.interfaces import IGameRenderer
+from localization import Localization
 
 class GameRenderer(IGameRenderer):
     """
     Handles all rendering for the Circle of Fifths game.
     """
 
-    def __init__(self, screen: pygame.Surface, overlay: pygame.Surface, font_small: pygame.font.Font,
-                 font_large: pygame.font.Font, loc):
-        self.screen = screen
-        self.overlay = overlay
-        self.font_small = font_small
-        self.font_large = font_large
-        self.loc = loc
+    def __init__(self, lang: str = "en") -> None:
+        
+        self.screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+        self.overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
+        self.font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
+        self.font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+        self.loc: Localization = Localization(lang)
+
         self.circle_render = CircleOfFifthsDrawable(
             major_chords, minor_chords,
             center=Config.CIRCLE_CENTER,

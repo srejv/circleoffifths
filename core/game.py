@@ -42,15 +42,7 @@ class CircleOfFifthsGame:
         self.blink_manager = BlinkManager()
 
         if renderer is None:
-            screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
-            overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
-            font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
-            font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
-            loc: Localization = Localization(lang)
-
-            renderer = GameRenderer(
-                screen, overlay, font_small, font_large, loc
-            )
+            renderer = GameRenderer()
         self.renderer: IGameRenderer = renderer
 
     def handle_events(self) -> None:
