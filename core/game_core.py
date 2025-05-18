@@ -47,3 +47,14 @@ class GameCore:
             "selected_indices": list(self.selected_indices),
             "last_result": self.last_result,
         }
+
+    def get_chord_list(self, chord_type: ChordType):
+        return self.circle.get_chord_list(chord_type)
+    
+    @property
+    def major_chords(self):
+        return self.circle.majorChords
+
+    @property
+    def minor_chords(self):
+        return self.circle.minorChords

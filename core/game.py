@@ -42,11 +42,10 @@ class CircleOfFifthsGame:
 
         self.loc: Localization = Localization(lang)
 
-        self.circle: CircleOfFifths = CircleOfFifths()
-        self.circle_render: CircleOfFifthsDrawable = CircleOfFifthsDrawable(self.circle.majorChords, self.circle.minorChords)
+        self.circle_render = CircleOfFifthsDrawable(self.core.major_chords, self.core.minor_chords)
         self.circle_render.set_center((400, 360))
 
-        self.selected_chord_indices: Set[int] = set(range(len(self.circle.get_chord_list(ChordType.MAJOR))))
+        self.selected_chord_indices: Set[int] = set(range(len(self.core.get_chord_list(ChordType.MAJOR))))
         self.correct_answers: int = 0
         self.total_questions: int = 0
         self.input_text: str = ""
@@ -209,7 +208,7 @@ class CircleOfFifthsGame:
         Returns:
             str: The localized question string.
         """
-        chord_list = self.circle.get_chord_list(state["chord_type"])
+        chord_list = self.core.get_chord_list(state["chord_type"])
         selected_index = chord_list.index(state["current_chord"])
         chord_type_str = self.loc.t("major") if state["chord_type"] == ChordType.MAJOR else self.loc.t("minor")
         hour = (selected_index + 11) % 12 + 1
