@@ -158,7 +158,7 @@ class CircleOfFifthsGame:
         """
         Renders the current quiz question at the top of the screen.
         """
-        question_surface = self.font_small.render(self.generate_question_text(state), True, Config.COLORS["text"])
+        question_surface = self.font_small.render(self.generate_question_text(state, self.loc), True, Config.COLORS["text"])
         question_text_rect = question_surface.get_rect(center=(400, 20))
         self.screen.blit(question_surface, question_text_rect)
 
@@ -175,7 +175,7 @@ class CircleOfFifthsGame:
         Renders the result/feedback message after an answer is submitted.
         """
         if state.get("last_result") is not None:
-            text = self.get_feedback_message(state)
+            text = self.get_feedback_message(state, self.loc)
             result_surface = self.font_small.render(text, True, Config.COLORS["text"])
             result_text_rect = result_surface.get_rect(center=(400, 110))
             self.screen.blit(result_surface, result_text_rect)
@@ -189,7 +189,7 @@ class CircleOfFifthsGame:
         )
         self.screen.blit(answers_surface, (700, 20))
 
-    def generate_question_text(self, state) -> str:
+    def generate_question_text(self, state, loc) -> str:
         """
         Generates the localized question text for the current quiz question.
 
@@ -210,14 +210,14 @@ class CircleOfFifthsGame:
             QuestionType.ANY: "question_any",
         }
         key = question_keys.get(state["current_question"], "question_fill_in")
-        return self.loc.t(
+        return loc.t(
             key,
             chord_type=chord_type_str,
             hour=hour,
             chord=chord_str
         )
 
-    def get_feedback_message(self, state) -> str:
+    def get_feedback_message(self, state, loc) -> str:
         """
         Generates the localized feedback message for the user's answer.
 
@@ -234,7 +234,7 @@ class CircleOfFifthsGame:
             return ""
 
         if state["last_result"]["correct"] == False and state.get("last_result").get("reason") is not None:
-            return self.loc.t(state["last_result"]["reason"])
+            return loc.t(state["last_result"]["reason"])
 
         is_correct = state.get("last_result").get("correct")
         chord_str = str(state.get("current_chord"))
@@ -254,7 +254,7 @@ class CircleOfFifthsGame:
             (False, QuestionType.COUNTERCLOCKWISE): "feedback_incorrect_counterclockwise",
         }
         key = feedback_keys.get((is_correct, state["current_question"]), "feedback_correct_fill_in" if is_correct else "feedback_incorrect_fill_in")
-        return self.loc.t(
+        return loc.t(
             key,
             answer=answer_str,
             selected=chord_str,
