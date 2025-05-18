@@ -34,14 +34,7 @@ class CircleOfFifthsGame:
         self.core.next_question()
 
         pygame.display.set_caption("Circle of Fifths Quiz")
-        self.screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
-        self.overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
         self.clock: pygame.time.Clock = pygame.time.Clock()
-
-        self.font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
-        self.font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
-
-        self.loc: Localization = Localization(lang)
 
         self.circle_render = CircleOfFifthsDrawable(self.core.major_chords, self.core.minor_chords)
         self.circle_render.set_center((400, 360))
@@ -51,9 +44,16 @@ class CircleOfFifthsGame:
         self.redraw: bool = True
         self.blink_manager = BlinkManager()
 
+        screen: pygame.Surface = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+        overlay: pygame.Surface = pygame.Surface((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT), pygame.SRCALPHA)
+        font_small: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_SMALL_SIZE)
+        font_large: pygame.font.Font = pygame.font.SysFont(None, Config.FONT_LARGE_SIZE)
+
+        loc: Localization = Localization(lang)
+
         self.renderer = GameRenderer(
-            self.screen, self.overlay, self.font_small, self.font_large,
-            self.circle_render, self.loc
+            screen, overlay, font_small, font_large,
+            self.circle_render, loc
         )
 
     def handle_events(self) -> None:
